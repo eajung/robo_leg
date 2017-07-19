@@ -2,11 +2,17 @@
 #07-19-2017
 #Mai Linh Ngo
 
+
+
+file1 = input('Enter name of 1st coord. file (include .txt extension): ')
+file2 = input('Enter name of 2nd coord. file (include .txt extension): ')
+
 #############################################
 #READ x-coordinate
 #############################################
 
-read_x = open('bigx.txt','r')
+read_x = open(file1,'r')
+#read_x = open('bigx.txt','r')
 l = read_x.readlines()
 #print(l)
 final_list = []
@@ -21,7 +27,8 @@ read_x.close()
 #############################################
 
 print('Now reading second coordinate')
-read_y = open('bigy.txt','r')
+read_y = open(file2,'r')
+#read_y = open('bigy.txt','r')
 m = read_y.readlines()
 #print(m)
 final_list2 = []
@@ -33,28 +40,10 @@ read_y.close()
 
 print('size of final_list is', len(final_list))
 print('size of final_list2 is', len(final_list2))
-print('val. of final_list[50]=', (final_list[50]))
-print('Type of final_list[50]=', type(final_list[50]))
-print(type(float(final_list[50])))
+#print('val. of final_list[50]=', (final_list[50]))
+#print('Type of final_list[50]=', type(final_list[50]))
+#print(type(float(final_list[50])))
 
-
-###============================================
-###====SORTING=================================
-###============================================
-##sort_x = []
-##sort_y = []
-##for i in range(0, len(final_list)-1):
-##    z = float(final_list[i])
-##    #print("i'm in the loop")
-##    #print("z is:",z)
-##    if z < 10:
-##        sort_x.append(z)
-##        sort_y.append(z)
-##    else:
-##        continue
-##
-##print('size of sort_x is:',len(sort_x))
-##print('size of sort_y is:',len(sort_y))
 
 #============================================
 #====SORTING=================================

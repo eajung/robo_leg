@@ -25,9 +25,9 @@
  */
 #define FORCERESISTOR 10000 // value of the resistor in the circuit for calculating force
 #define THERMISTORPIN A0 // the pin to connect the sensor 
-#define STARTPOSITION = 0
+#define STARTPOSITION 0
 #define PEAKFLEXIONSTATE 1
-#define UNFLEXSTATE = 2
+#define UNFLEXSTATE 2
 
 
 const int button_pin = 2; // the number of the switch pin
@@ -38,7 +38,7 @@ unsigned long time; // time might be used by the delay()
 float fact; // dependent on the voltage 
 float stretchcord_reading; // analog reading for the stretch sensor
 float maximum_tension = 2.7; // software set maximum tension in cables compared to the stretchcord_reading
-float fully_flexed_angle_tension = 2.2
+float fully_flexed_angle_tension = 2.2;
 float taut_tension = 1.4; // software set tension for when the leg is back to being taught
 float force; // force calcuation based off of the stretchcord_reading
 

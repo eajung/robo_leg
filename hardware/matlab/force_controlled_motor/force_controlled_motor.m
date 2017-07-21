@@ -9,8 +9,9 @@ clc
 
 % Define local reference variables
 flexed_state = 0;
-maximum_tension = 3.66;
-rest_tension = 1.3;
+maximum_tension = 2.7;
+rest_tension = 1.4;
+maximum_angle_flexion_tension = 2.1
 
 % Create an Arduino object in MATLAB
 % Subject to change: '/dev/tty.usbmodem1461' 
@@ -40,13 +41,17 @@ stretchcord_reading = readVoltage(arduino_object, 'A0');
 r_s = 10000 / ((5/stretchcord_reading) - 1); % voltage drop
 force = ((0.759096*exp(0.00178499*r_s)) - 1.26725); 
 
-if force > maximum_tension % If we reach the maximum tension in the hamstring
-    motor_api.stop(dcm); % Stop knee flexion
-    motor_api.decrease(dcm); % Start releasing the knee back to resting position
+if (force > maximum_tension) && (flexed_state == 0) % If we reach the maximum tension in the hamstring
     flexed_state = 1; % Update state
 end
 
-if (force < rest_tension) && (flexed_state == 1) % Once we're back at rest length
+if (force < maximum_angle_flexion_tension) && (flexed_state == 1) % If we reach the maximum tension in the hamstring
+    motor_api.stop(dcm); % Stop knee flexion
+    motor_api.decrease(dcm); % Start releasing the knee back to resting position
+    flexed_state = 2; % Update state
+end
+
+if (force < rest_tension) && (flexed_state == 2) % Once we're back at rest length
     motor_api.stop(dcm); % Stop the release of the knee
     flexed_state = 0;
     stop(dcm); % Cut power off to M1

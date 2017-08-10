@@ -74,13 +74,13 @@ Adafruit_DCMotor *hamstring_motor = AFMS.getMotor(3); // Knee Flexion motor, was
  * increase, decrease, etc.
  */
 //=================================================================
-void increase_motor_speed(int motor_number, uint8_t motor_direction) { //( direction, motor)
+void increase_motor_speed(int motor_number, uint8_t motor_direction, int motor_speed) { //( direction, motor)
   switch(motor_number){
     case 1:
       Serial.print("hip flex forward");
       f_hip_motor->run(motor_direction);
       Serial.print("increasing motor speed");
-      for(i=0;i<100;i++){
+      for(i=0;i<motor_speed;i++){
        f_hip_motor->setSpeed(i);
        delay(5);
        
@@ -91,7 +91,7 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction) { //( direc
       Serial.print("hip flex backwards");
       b_hip_motor->run(motor_direction);
       Serial.print("increasing motor speed");
-      for(i=0;i<100;i++){
+      for(i=0;i<motor_speed;i++){
        b_hip_motor->setSpeed(i);
        delay(5);
        
@@ -102,7 +102,7 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction) { //( direc
       Serial.print("knee flex backwards");
       hamstring_motor->run(motor_direction);
       Serial.print("increasing motor speed");
-      for(i=0;i<100;i++){
+      for(i=0;i<motor_speed;i++){
        hamstring_motor->setSpeed(i);
        delay(5);
        
@@ -120,6 +120,7 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction) { //( direc
 
 //=================================================================
 //=================================================================
+//motor speed ranges from 0-255
 void decrease_motor_speed(int motor_number, uint8_t motor_direction) { 
     switch(motor_number){
     case 1:
@@ -152,57 +153,42 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
     
   }//end of switch
   
-//  Serial.println("Decreaseing motor speed\n");
-//  for (i=100; i!=0; i--) {
-//    hamstring_motor->setSpeed(i);
-//    delay(5);
-//  }
-
-
 }//end of decrease_motor_speed()
-//=================================================================
-//=================================================================
 
-//flex hip forwards-backwards//=======
 
+//===FLEX=HIP=========================================================
 //distance,direction, motor
 //(1=>forward, 2=>backwards)
-void hip_flex(int distance, int motor_number, uint8_t motor_direction){  
+void hip_flex(int distance, int motor_number, uint8_t motor_direction, int motor_speed){  //40% motorspeed
   Serial.println("Flexing hip");
-  increase_motor_speed(motor_number,motor_direction);
-  decrease_motor_speed(1,FORWARD); 
-  
+  increase_motor_speed(motor_number,motor_direction,motor_speed);
   delay(distance*fact);
+  decrease_motor_speed(motor_number,motor_direction);
+   
 }
 
-//=================================================================
-//=================================================================
+//Seperate rear motor function for test and running at different motor speeds, this one is at 100%
+void hip_flex_b(int distance, int motor_number, uint8_t motor_direction, int motor_speed){  
+  Serial.println("Flexing hip");
+  increase_motor_speed(motor_number,motor_direction,motor_speed);//run rear motor to maximum capacity
+  delay(distance*fact);
+  decrease_motor_speed(motor_number,motor_direction);
+   
+}
 
-//flex knee backwards//=======
+
+//==FLEX=KNEE=========================================================
+
+//flex=only=backwards=======
 void knee_flex(int distance, uint8_t motor_direction){
   Serial.println("Flexing knee backwards");
-  increase_motor_speed(motor_direction,HAMSTRING_MOTOR);
+  increase_motor_speed(motor_direction,HAMSTRING_MOTOR,100);
   delay(distance*fact);
  
 }
 
-//=================================================================
-//===END OF FUNCTIONS==============================================
-
-
-
-
-
-
-
-
-
-
-
-
-
 //====SETUP===================================================
-//============================================================
+
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -225,8 +211,6 @@ void setup() {
 }
 
 
-
-
 //==LOOP======================================================
 //============================================================
 // Put your main code here to run repeatedly:
@@ -237,47 +221,30 @@ void loop() {
   delay(10); //refreashing time constant
   
   button_state = digitalRead(button_pin); // read the state of the switch value
-  //  Serial.println(button_state);
-
 
   //Algorithm for GAIT
   if (button_state == HIGH) {
   //    Serial.print("Knee Flexion\n");
    // hamstring_motor->run(FORWARD);
-   
-    //Start by raising hip forward
-    hip_flex(2000, 1, FORWARD);  //pull front cable
+
+
+    hip_flex_b(7000, 2, BACKWARD,255);//rear cable release
     delay(10);  // need to make both run at the same time
-    hip_flex(1000, 2, BACKWARD); //loosen up rear cable
-
-    //Release the knee
-   // knee_flex(1500,BACKWARD);
     
+    //Start by raising hip forward
+    hip_flex(4500, 1, FORWARD,100);  //pull front cable
+    delay(10);
+
+    hip_flex(3000, 1, BACKWARD,100); //release front cable
+
+    hip_flex_b(7000, 2, FORWARD,255);//rear cable tigten
+    delay(10);  // need to make both run at the same time
+
+
     
+       
     
-    
-  }
-
-
-
-
-
-  
-  
-//  stretchcord_reading = analogRead(THERMISTORPIN); // reads the A0 pin for the voltage values of the stretch cord sensor
-//  //  Serial.print("Analog reading:");
-//  //  Serial.println(stretchcord_reading);
-// 
-//  // convert the value to resistance
-//  stretchcord_reading = (1023 / stretchcord_reading)  - 1;
-//  stretchcord_reading = FORCERESISTOR / stretchcord_reading;
-//  
-//  force = ((0.759096*exp(0.00178499*stretchcord_reading)) - 1.26725); // formula found from sensor calibration tests
-//  //  Serial.print("Force: ");
-//  //  Serial.println(force);
-
-
-
+  }//end of button_state if
 
 
 
@@ -289,39 +256,4 @@ void loop() {
 
 
 
-
-  /*
-   * This allows us to mark when we have reached a specific angle.
-  char inChar;
-  //user hits enter 
-  if(Serial.available()){
-    inChar = Serial.read(); // Read the input from the send on the serial monitr
-    if(inChar == '\n'){
-      counter += 10;
-      Serial.print("angle is: ");
-      Serial.println(counter); // Tells us which angle we're at
-      Serial.println(force); // Tell us the force at the specified angle
-    }
-  }
-  */
-  
-//  if (force > maximum_tension) { // Let us know we've reached about 60-70 degree knee flexion
-//    flexed_state = 1; 
-//  }
-//
-//  if ((force < fully_flexed_angle_tension) && (flexed_state == 1)){ // Approaching maximum degree for knee flexion
-//    decrease_motor_speed(FORWARD,3);
-//    delay(1000);
-//    hamstring_motor->run(BACKWARD);
-//    increase_motor_speed(FORWARD,3);/////initially empty ()
-//    flexed_state = 2;
-//  }
-//
-//  if ((force < taut_tension) && (flexed_state == 2)) { // Stop motors once at rest length.
-//    decrease_motor_speed(FORWARD,3);
-//    Serial.println("Finished.");
-//    hamstring_motor->run(RELEASE);
-//    delay(500);
-//    flexed_state = STARTPOSITION;
-//  }
 

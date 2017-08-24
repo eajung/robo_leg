@@ -24,7 +24,7 @@
 const int button_pin = 2; // the number of the switch pin
 int button_state = 0; // this will change based on the state of the push button status
 unsigned long time; // time might be used by the delay()
-Tensegrity_Motor motor();
+Tensegrity_Motor tensegrity_motor;
 
 //====SETUP===================================================
 
@@ -47,11 +47,12 @@ void loop() {
 
   //Algorithm for GAIT
   if (button_state == HIGH) {
-   Serial.println("Entering knee_flex");
-   motor.knee_flex(2000, 100);    
+    Serial.println("Entering knee_flex");
+    tensegrity_motor.hip_flex(2000, 100);    
   }//end of button_state if
   
 } //===================end of loop , END OF PROGRAM=================================
+
 
 
 

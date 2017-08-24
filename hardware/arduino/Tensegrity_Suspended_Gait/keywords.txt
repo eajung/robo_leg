@@ -1,0 +1,5 @@
+Tensegrity_Motor	KEYWORD1
+hip_flex	KEYWORD2
+hip_unflex	KEYWORD3
+knee_flex	KEYWORD4
+knee_unflex	KEYWORD5

@@ -95,8 +95,9 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
        //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF REAR
        b_hip_motor->setSpeed(i*.30); //rear hip motor releases simultaneously with front x2 to increase speed
        //run to is slowly enxtend knee forward will flexing hip
-       hamstring_motor->setSpeed(i*.55);
-       delay(5);  
+       hamstring_motor->setSpeed(i*.70);
+       
+       //delay(5);  
       }
       break;   
     
@@ -110,10 +111,11 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
       Serial.print("increasing motor speed");
       for(i=0;i<motor_speed;i++){
         //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
-       f_hip_motor->setSpeed(i*.30);//new
+       f_hip_motor->setSpeed(i*.40);//new
+       hamstring_motor->setSpeed(i*.65);
        b_hip_motor->setSpeed(i);
-       hamstring_motor->setSpeed(i*.70);
-       delay(5);
+       
+      // delay(5);
        
       }
       break;
@@ -143,7 +145,7 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
     //CHECK TO SEE IF MOTOR DIRECTION HERE MATTERS
       f_hip_motor->run(motor_direction);
       Serial.print("decreasing front hip motor speed");
-      for(i=100; i!=0; i--){
+      for(i=10; i!=0; i--){
        f_hip_motor->setSpeed(i);
        b_hip_motor->setSpeed(i); //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF REAR
        delay(5);
@@ -153,17 +155,21 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
     case 2:
       b_hip_motor->run(motor_direction);
       Serial.print("decreasing back hip motor speed");
-      for(i=100; i!=0; i--){
+      for(i=10; i!=0; i--){
        //new addition
        f_hip_motor->setSpeed(i); // IF YOU CALL BACKWARD FLEXION, REDUCE SPEED OF FRONT MOTOR   
        b_hip_motor->setSpeed(i);
+       hamstring_motor->setSpeed(i);
+       
        delay(5);
       }
       break;
     case 3:
       hamstring_motor->run(motor_direction);
       Serial.print("decreasing hamstring motor speed");
-      for(i=100; i!=0; i--){
+      for(i=10; i!=0; i--){
+       f_hip_motor->setSpeed(i); // IF YOU CALL BACKWARD FLEXION, REDUCE SPEED OF FRONT MOTOR   
+       b_hip_motor->setSpeed(i); 
        hamstring_motor->setSpeed(i);
        delay(5);
       }
@@ -186,10 +192,29 @@ void hip_flex(int distance, int motor_number, uint8_t motor_direction_f, uint8_t
 void knee_flex(int distance, uint8_t motor_direction_f, uint8_t motor_direction_b){
   Serial.println("Flexing knee backwards");
 //(int motor_number, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed)
-  increase_motor_speed(3, motor_direction_f,motor_direction_b,100);
+  increase_motor_speed(3, motor_direction_f,motor_direction_b,120);
   delay(distance*fact);
   decrease_motor_speed(3, motor_direction_f);
 }//end of knee_flex----------------------------------------------------------------------
+
+
+//========HIP-Flex-forward-knee-in-place===============//
+void knee_inplace(int distance, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){
+      f_hip_motor->run(motor_direction_f); 
+      b_hip_motor->run(motor_direction_b); 
+      for(i=0;i<motor_speed;i++){
+       f_hip_motor->setSpeed(i*.70); //front hip motor pulls forward. 
+       b_hip_motor->setSpeed(i*.25); //rear hip motor releases simultaneously with front x2 to increase speed
+       //delay(5);
+      }
+      delay(5000); ///DELAY TO KEEP LEG KNEEING FORWARD 3:26PM
+      for(i=100; i!=0; i--){
+       //new addition
+       f_hip_motor->setSpeed(i*.90); // IF YOU CALL BACKWARD FLEXION, REDUCE SPEED OF FRONT MOTOR   
+       b_hip_motor->setSpeed(i*.85);
+      // delay(5);
+      }  
+}
 
 
 //====SETUP===================================================
@@ -234,33 +259,24 @@ void loop() {
   
     //====FIRST_STEP=====//
     //flex hamstring to bring knee slightly up
-    knee_flex(2600, FORWARD, BACKWARD);
+    knee_flex(4500, FORWARD, BACKWARD);
     delay(10);
     //bring hip forward
     //pull front cable  (distance, motor number, f_motor_direction, b_motor_direct, speed)
-    hip_flex(9500, 1, BACKWARD, FORWARD,100);  
+    hip_flex(4000, 1, BACKWARD, FORWARD,200);  //ORGINALLY 4000 AND 4500 3:26PM
     delay(10);
-////    //release hamstring to allow for forward knee extension
-//    knee_flex(1500, BACKWARD, FORWARD);
-//    delay(10);
 
     //====FOLLOW-THROUGH===//
 //    //bring leg back to neutral then past continue swinging back 
-    hip_flex(9800, 2, FORWARD, BACKWARD,100);  
+    hip_flex(6000, 2, FORWARD, BACKWARD, 120);  
     delay(10);
-   
-////    //Then end with knee up to finish "follow-through"
-//    knee_flex(3500, FORWARD, BACKWARD);
-//    delay(10);
-//    knee_flex(3000, BACKWARD, FORWARD);
-//    delay(10);
+  //-------Calling separate file hip_flex_knee in place
 
-     //bring hip back to original starting position
-    hip_flex(2000, 1, BACKWARD, FORWARD,100); 
-    delay(10);
+   // void knee_inplace(int distance, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){
+    knee_inplace(40, BACKWARD,FORWARD,170);
     
-//RETURN KNEE BACK TO NEUTRAL    
-    knee_flex(650, BACKWARD, FORWARD);
+  //RETURN KNEE BACK TO NEUTRAL    
+    knee_flex(2700, BACKWARD, FORWARD);
     delay(10);
 
 

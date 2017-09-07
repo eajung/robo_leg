@@ -1504,6 +1504,42 @@
 		<!--Forces in the model.-->
 		<ForceSet>
 			<objects>
+				<CoordinateLimitForce name="Hip_Angle_Limit">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Coordinate (name) to be limited.-->
+					<coordinate>Hip_Angle</coordinate>
+					<!--Stiffness of the passive limit force when coordinate exceeds upper limit. Note, rotational stiffness expected in N*m/degree.-->
+					<upper_stiffness>20</upper_stiffness>
+					<!--The upper limit of the coordinate range of motion (rotations in degrees).-->
+					<upper_limit>50</upper_limit>
+					<!--Stiffness of the passive limit force when coordinate exceeds lower limit. Note, rotational stiffness expected in N*m/degree.-->
+					<lower_stiffness>20</lower_stiffness>
+					<!--The lower limit of the coordinate range of motion (rotations in degrees).-->
+					<lower_limit>-50</lower_limit>
+					<!--Damping factor on the coordinate's speed applied only when limit is exceeded. For translational has units N/(m/s) and rotational has Nm/(degree/s)-->
+					<damping>0.1</damping>
+					<!--Transition region width in the units of the coordinate (rotations in degrees). Dictates the transition from zero to constant stiffness as coordinate exceeds its limit.-->
+					<transition>1</transition>
+				</CoordinateLimitForce>
+				<CoordinateLimitForce name="Knee_Angle_Limit">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Coordinate (name) to be limited.-->
+					<coordinate>Knee_Angle</coordinate>
+					<!--Stiffness of the passive limit force when coordinate exceeds upper limit. Note, rotational stiffness expected in N*m/degree.-->
+					<upper_stiffness>20</upper_stiffness>
+					<!--The upper limit of the coordinate range of motion (rotations in degrees).-->
+					<upper_limit>0</upper_limit>
+					<!--Stiffness of the passive limit force when coordinate exceeds lower limit. Note, rotational stiffness expected in N*m/degree.-->
+					<lower_stiffness>20</lower_stiffness>
+					<!--The lower limit of the coordinate range of motion (rotations in degrees).-->
+					<lower_limit>-100</lower_limit>
+					<!--Damping factor on the coordinate's speed applied only when limit is exceeded. For translational has units N/(m/s) and rotational has Nm/(degree/s)-->
+					<damping>0.1</damping>
+					<!--Transition region width in the units of the coordinate (rotations in degrees). Dictates the transition from zero to constant stiffness as coordinate exceeds its limit.-->
+					<transition>1</transition>
+				</CoordinateLimitForce>
 				<Thelen2003Muscle name="quad_cable_one">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>false</isDisabled>
@@ -2662,7 +2698,7 @@
 					<!--The maximum force this actuator can produce.-->
 					<optimal_force>1</optimal_force>
 					<!--Maximum isometric force that the fibers can generate-->
-					<max_isometric_force>0.75</max_isometric_force>
+					<max_isometric_force>0.075</max_isometric_force>
 					<!--Optimal length of the muscle fibers-->
 					<optimal_fiber_length>0.12823851</optimal_fiber_length>
 					<!--Resting length of the tendon-->
@@ -2705,7 +2741,7 @@
 									<body>steel_beam</body>
 								</PathPoint>
 								<PathPoint name="psoas-P2">
-									<location> 0 0.18 0</location>
+									<location> 0 0.1 0</location>
 									<body>femur_stick</body>
 								</PathPoint>
 							</objects>
@@ -2927,7 +2963,7 @@
 									<body>steel_beam</body>
 								</PathPoint>
 								<PathPoint name="psoas-P2">
-									<location> 0 0.18 0</location>
+									<location> 0 0.1 0</location>
 									<body>femur_stick</body>
 								</PathPoint>
 							</objects>
@@ -3883,16 +3919,6 @@
 		<ContactGeometrySet>
 			<!--All properties of this object have their default values.-->
 		</ContactGeometrySet>
-		<!--Constraints in the model.-->
-		<ConstraintSet name="Hip_Constraint">
-			<PointConstraint>
-				<isDisabled>false</isDisabled>
-				<body_1>spine_stick</body_1>
-				<body_2>hip_stick_y_massless</body_2>
-				<location_body_1>0 0 0</location_body_1>
-				<location_body_2>0 0 0</location_body_2>
-			</PointConstraint>
-		</ConstraintSet>
 		<!--Controllers in the model.-->
 		<ControllerSet name="Controllers">
 			<objects />

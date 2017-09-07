@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ControlSet name="Tensegrity_Knee_CMC_muscle_control_limits">
+	<defaults/>
+	<objects>	
+		<ControlLinear name="quad_cable_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+    
+		<ControlLinear name="quad_cable_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+    
+		<ControlLinear name="knee_y_one_to_knee_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="knee_y_two_to_knee_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="knee_y_one_to_knee_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="knee_y_two_to_knee_three.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="knee_y_two_to_femur.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="knee_y_one_to_femur.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="calf_cable_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="calf_cable_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="front_calf_cable.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="knee_two_to_tibia.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="knee_three_to_tibia.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hamstring_cable_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hamstring_cable_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hamstring.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="psoas.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="psoas_cable_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="psoas_cable_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="semimembranosus.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="semimembranosus_cable_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="semimembranosus_cable_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hip_top_three_to_femur.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hip_top_four_to_femur.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hip_top_two_to_femur.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hip_top_one_to_femur.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hip_top_two_to_hip_stick_y_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hip_top_one_to_hip_stick_y_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hip_top_three_to_hip_stick_y_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="hip_top_four_to_hip_stick_y_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="spine_stick_to_hip_stick_y_one.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="spine_stick_to_hip_stick_y_two.excitation">
+			<default_min>       0.00000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+	</objects>
+</ControlSet>

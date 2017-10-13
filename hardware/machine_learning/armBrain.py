@@ -9,7 +9,8 @@ goal = (0,0,30)
 arm = QLearning.armAgent(goal)
 reward = 0
 
-ser = serial.Serial('COM3', 57600)
+# ser = serial.Serial('/dev/cu.usbmodem1441', 57600)
+ser = serial.Serial('/dev/cu.usbmodem1441', 57600, timeout=1)
 kp = 4
 set_point = -30
 while True:
@@ -18,6 +19,7 @@ while True:
     raw = ser.readline()
     raw = raw.strip()
     dev_id,x,y,z = raw.split(',')
+    # Raw X,Y,Z into those values from the arduino
     x = float(x)
     y = float(y)
     z = float(z)

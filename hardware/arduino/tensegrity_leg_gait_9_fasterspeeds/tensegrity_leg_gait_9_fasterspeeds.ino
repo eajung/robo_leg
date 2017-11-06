@@ -30,7 +30,9 @@
 #include <Adafruit_MotorShield.h>
 #include <stdio.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
 // ------------------------------------------------------
 
 /*
@@ -40,9 +42,18 @@
 #define THERMISTORPIN A0 // the pin to connect the sensor 
 #define STARTPOSITION 0
 #define PEAKFLEXIONSTATE 1
+#define STATE1 1
+#define STATE2 2
+#define STATE3 3
+#define STATE4 4
+#define STATE5 5
+#define STATE_FINISHED 6
 #define UNFLEXSTATE 2
 #define HAMSTRING_MOTOR 3
+#define BNO055_SAMPLERATE_DELAY_MS (100) /* Set the delay between fresh samples */
 
+
+int leg_state;
 const int button_pin = 2; // the number of the switch pin
 int button_state = 0; // this will change based on the state of the push button status
 int flexed_state = 0; // tells us if the leg has flexed
@@ -72,8 +83,7 @@ Adafruit_DCMotor *f_hip_motor = AFMS.getMotor(1);  //hip flex forward motor
 Adafruit_DCMotor *b_hip_motor = AFMS.getMotor(2);  //hip flex rear motor
 Adafruit_DCMotor *hamstring_motor = AFMS.getMotor(3); // knee flex backwards motor
 
-
-
+Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 //=================================================================
 /* Helper functions to make the main code look cleaner:
@@ -182,6 +192,7 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
 //distance,direction, motor
 //(1=>forward, 2=>backwards)
 void hip_flex(int distance, int motor_number, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){  //40% motorspeed
+  
   Serial.println("Flexing hip");
   increase_motor_speed(motor_number,motor_direction_f, motor_direction_b,motor_speed); //calls this fuctions and passes parameters
   delay(distance*fact);
@@ -229,13 +240,21 @@ void setup() {
   
   AFMS.begin();  // create with the default frequency 1.6KHz
   //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
+  if(!bno.begin())
+  {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    while(1);
+  }
 
-  
+  bno.setExtCrystalUse(true);
  
   hamstring_motor->setSpeed(0); // Set the speed to start, from 0 (off) to 255 (max speed)
   hamstring_motor->run(FORWARD);
   hamstring_motor->run(RELEASE); // turn on motor
- 
+  
+  
+  
   pinMode(button_pin, INPUT); // initialize the switch pin as an input
   //digitalWrite(button_pin, High); //Turn on Internal pull-up 
 }
@@ -251,37 +270,92 @@ void loop() {
   delay(10); //refreashing time constant
   
   button_state = digitalRead(button_pin); // read the state of the switch value
-
-
-  
+  sensors_event_t event;
+  bno.getEvent(&event);
 //---WALKING-GAIT-ALGORITHM-----------------------------------------------------------------
- if (button_state == HIGH) {
-  
+  if (button_state == HIGH) {
+    leg_state = STATE1;
+  }
     //====FIRST_STEP=====//
     //flex hamstring to bring knee slightly up
-    knee_flex(4500, FORWARD, BACKWARD);
-    delay(10);
-    //bring hip forward
-    //pull front cable  (distance, motor number, f_motor_direction, b_motor_direct, speed)
-    hip_flex(4000, 1, BACKWARD, FORWARD,200);  //ORGINALLY 4000 AND 4500 3:26PM
-    delay(10);
-
-    //====FOLLOW-THROUGH===//
-//    //bring leg back to neutral then past continue swinging back 
-    hip_flex(6000, 2, FORWARD, BACKWARD, 120);  
-    delay(10);
-  //-------Calling separate file hip_flex_knee in place
+  //RETURN KNEE BACK TO NEUTRAL    
+  if (leg_state == STATE5) {
+    knee_flex(2700, BACKWARD, FORWARD);
+    /* Get a new sensor event */
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS);
+    leg_state = STATE_FINISHED;
+  }
 
    // void knee_inplace(int distance, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){
+  if (leg_state == STATE4) {
     knee_inplace(40, BACKWARD,FORWARD,170);
-    
-  //RETURN KNEE BACK TO NEUTRAL    
-    knee_flex(2700, BACKWARD, FORWARD);
+    /* Get a new sensor event */
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS);
+    leg_state = STATE5;
+  }
+  //====FOLLOW-THROUGH===//
+  //    //bring leg back to neutral then past continue swinging back 
+  if (leg_state == STATE3) {
+    hip_flex(6000, 2, FORWARD, BACKWARD, 120); 
+    /* Get a new sensor event */
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS); 
+    leg_state = STATE4;
+  }
+  //bring hip forward
+  //pull front cable  (distance, motor number, f_motor_direction, b_motor_direct, speed)
+  if (leg_state == STATE2) {
+    hip_flex(4000, 1, BACKWARD, FORWARD,200);  //ORGINALLY 4000 AND 4500 3:26PM
+    /* Get a new sensor event */
+    bno.getEvent(&event);
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS);
+    leg_state = STATE3;
+  }
+
+  if (leg_state == STATE1) {
+    knee_flex(4500, FORWARD, BACKWARD);
+    /* Get a new sensor event */
+  
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS);
     delay(10);
+    leg_state = STATE2;
+  }
+
+  //-------Calling separate file hip_flex_knee in place
+
 
 
     
-  }//-----------END OF button_state if statement--------!!
+//  }//-----------END OF button_state if statement--------!!
 
 
 }//===================end of loop , END OF PROGRAM=================================

@@ -1,5 +1,5 @@
 /*
- * File name: tensegrity_leg_gait_6.ino
+ * File name: tensegrity_leg_gait.ino
  * Authors: Erik Jung and Lawrence Ngo
  * Comments: This a tensegrity knee with newly add hip joint. The purpose of this design is to mimic
  *           human gait. At the moment, the design relies soley on timers for movement.

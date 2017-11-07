@@ -37,7 +37,7 @@
 #define BNO055_SAMPLERATE_DELAY_MS 100 // Set the delay between fresh samples
 sensors_event_t old_event;
 int i, current_state, theta_direction;
-float target_theta_x_low, target_theta_y_low, target_theta_z_low, target_theta_x_high, target_theta_y_high, target_theta_y_high;  
+float target_theta_x_low, target_theta_y_low, target_theta_z_low, target_theta_x_high, target_theta_y_high, target_theta_z_high;  
 String input; // keyboard input
 char command; // hotkey parsed from input
 //-----------------------------------------------------
@@ -71,7 +71,7 @@ bool range(float min, float max, float i) {
 
 // targeted_bounds():
 // Returns true if the gyroscope is within the designated bounds set for the next stage
-bool targeted_bounds() {
+bool targeted_bounds(sensors_event_t event) {
   return ((range(target_theta_x_low, target_theta_x_high, event.orientation.x)) && 
           (range(target_theta_y_low, target_theta_x_high, event.orientation.y)) && 
           (range(target_theta_z_low, target_theta_z_high, event.orientation.z)));
@@ -86,7 +86,7 @@ bool point_reached(sensors_event_t event) {
       target_theta_x_low = 358; target_theta_x_high = 360;
       target_theta_y_low = -77; target_theta_y_high = -75;
       target_theta_z_low = 77; target_theta_z_high = 79;
-      if (targeted_bounds()) {
+      if (targeted_bounds(event)) {
         current_state = EXTENSION_FORWARD_STATE; // current state is now a different range
         return true;
       }
@@ -95,7 +95,7 @@ bool point_reached(sensors_event_t event) {
       target_theta_x_low = 330.75; target_theta_x_high = 331.25;
       target_theta_y_low = -78.1; target_theta_y_high = -77.75;
       target_theta_z_low = -77.8; target_theta_z_high = -77;
-      if (targeted_bounds()) {
+      if (targeted_bounds(event)) {
         current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range
         return true;
       }
@@ -104,7 +104,7 @@ bool point_reached(sensors_event_t event) {
       target_theta_x_low = 331.35; target_theta_x_high = 331.75;
       target_theta_y_low = -78.75; target_theta_y_high = -78.2;
       target_theta_z_low = -75.75; target_theta_z_high = -75.25;
-      if (targeted_bounds()) {
+      if (targeted_bounds(event)) {
         current_state = FOLLOW_THROUGH_STATE; // current state is now a different range
         return true;
       }
@@ -113,16 +113,16 @@ bool point_reached(sensors_event_t event) {
       target_theta_x_low = 18; target_theta_x_high = 20;
       target_theta_y_low = -58.5; target_theta_y_high = -56.5;
       target_theta_z_low = 86; target_theta_z_high = 88.5;
-      if (point_reached()) {
+      if (targeted_bounds(event)) {
         current_state = EQUILIBRIUM_STATE; // current state is now a different range
         return true;
       }
       break;
     case RETURN_TO_EQUILIBRIUM_STATE:
       target_theta_x_low = 36; target_theta_x_high = 38;
-      target_theta_y_low = -38; target_theta_y_high = -36
+      target_theta_y_low = -38; target_theta_y_high = -36;
       target_theta_z_low = 89; target_theta_z_high = 91;
-      if (point_reached()) {
+      if (targeted_bounds(event)) {
         current_state = EQUILIBRIUM_STATE; // current state is now a different range
         return true;
       }
@@ -290,31 +290,31 @@ void loop() {
 
   switch (current_state) {
     case HEEL_LIFT_STATE:
-      if (point_reached()) {
+      if (point_reached(event)) {
         stop_motion();
         extend_forward(BACKWARD, FORWARD, 200);
       }
       break;
     case EXTENSION_FORWARD_STATE:
-      if (point_reached()) {
+      if (point_reached(event)) {
         stop_motion();
         extend_forward(BACKWARD, FORWARD, 200);
       }
       break;
     case EXTENSION_FORWARD_STATE_PART_2:
-      if (point_reached()) {
+      if (point_reached(event)) {
         stop_motion();
         follow_through(BACKWARD, FORWARD, 200);
       }
       break;
     case FOLLOW_THROUGH_STATE:
-      if (point_reached()) {
+      if (point_reached(event)) {
         stop_motion();
         return_equilibrium(BACKWARD, FORWARD, 200);
       }
       break;
     case RETURN_TO_EQUILIBRIUM_STATE:
-      if (point_reached()) {
+      if (point_reached(event)) {
         stop_motion();
       }
       break;

@@ -12,6 +12,7 @@
 
 // Standard libraries
 #include <stdio.h>
+#include <stdbool.h>
 // Motor libraries
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
@@ -20,155 +21,214 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
 #include <utility/imumaths.h>
+
 //-----------------------------------------------------
 
-/*
- * Define any global or set variables
- */
+//Define any global or set variables
 #define ILIOPSOAS_MOTOR_NUMBER 1
 #define GLUTE_MOTOR_NUMBER 2
 #define HAMSTRING_MOTOR_NUMBER 3
-#define BNO055_SAMPLERATE_DELAY_MS (100) /* Set the delay between fresh samples */
-
-int button_state = 0;
-int target_theta = 40;
-int i;
-String input;
-char command;
+#define EQUILIBRIUM_STATE 0
+#define HEEL_LIFT_STATE 1
+#define EXTENSION_FORWARD_STATE 2
+#define EXTENSION_FORWARD_STATE_PART_2 3
+#define FOLLOW_THROUGH_STATE 4
+#define RETURN_TO_EQUILIBRIUM_STATE 5
+#define BNO055_SAMPLERATE_DELAY_MS 100 // Set the delay between fresh samples
+sensors_event_t old_event;
+int i, current_state, theta_direction; 
+String input; // keyboard input
+char command; // hotkey parsed from input
 //-----------------------------------------------------
+
 /* 
  * Create the motor shield object with the default I2C address
  * Or, create it with a different I2C address (say for stacking) 
  * Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61);
  */
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
-/*
- * Select which 'port' M1, M2, M3, or M4. This is M1
- */
-//Creating instances of motor
-Adafruit_DCMotor *iliopsoas_motor = AFMS.getMotor(ILIOPSOAS_MOTOR_NUMBER);  //hip flex forward motor
-Adafruit_DCMotor *gluteus_motor = AFMS.getMotor(GLUTE_MOTOR_NUMBER);  //hip flex rear motor
+
+// Select which 'port' M1, M2, M3, or M4. This is M1
+// Creating instances of motor
+Adafruit_DCMotor *iliopsoas_motor = AFMS.getMotor(ILIOPSOAS_MOTOR_NUMBER); //hip flex forward motor
+Adafruit_DCMotor *gluteus_motor = AFMS.getMotor(GLUTE_MOTOR_NUMBER); //hip flex rear motor
 Adafruit_DCMotor *hamstring_motor = AFMS.getMotor(HAMSTRING_MOTOR_NUMBER); // knee flex backwards motor
 
 // Creating instances of BNO055
 Adafruit_BNO055 lower_leg_tracker = Adafruit_BNO055(55);
 
 //=====BEGIN HELPER FUNCTIONS=======================================================
-/* Helper functions to make the main code look cleaner:
- * increase_motor_speed, decrease_motor_speed, etc.
- */
-//====INCREASE MOTOR SPEED==========================================================
+// Helper functions to make the main code look cleaner:
+// increase_motor_speed, decrease_motor_speed, etc.
+
+// range():
+// Simple function that tells us if we're within the boundaries of what we expect our value to be within.
+bool range(float min, float max, float i) {
+  return min <= i  && i < max; 
+}
+
+// point_reached():
+// By taking the readings from the gyroscope and the given current_state of our system, we return 
+// true if the orientation of the gyroscope has reached the specified angles. 
+bool point_reached(sensors_event_t event) {
+  switch (current_state) {
+    case HEEL_LIFT_STATE: // if we are in the heel lift state
+      if ((range(358, 360, event.orientation.x)) && 
+          (range(-75,-77, event.orientation.y)) && 
+          (range(77,79, event.orientation.z))) {
+        current_state = EXTENSION_FORWARD_STATE; // current state is now a different range
+        return true;
+      }
+      break;
+    case EXTENSION_FORWARD_STATE:
+      if ((range(330.75, 331.25, event.orientation.x)) && 
+          (range(-78.1,-77.75, event.orientation.y)) && 
+          (range(-77.8,-77, event.orientation.z))) {
+        current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range
+        return true;
+      }
+      break;
+    case EXTENSION_FORWARD_STATE_PART_2:
+      if ((range(331.35, 331.5, event.orientation.x)) && 
+          (range(-78.5, -78.25, event.orientation.y)) && 
+          (range(-75.9,-75, event.orientation.z))) {
+        current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range
+        return true;
+      }
+      break;
+    case FOLLOW_THROUGH_STATE:
+      if ((range(18, 20, event.orientation.x)) && 
+          (range(-58.5, -56.5, event.orientation.y)) && 
+          (range(86, 88.5, event.orientation.z))) {
+        current_state = EQUILIBRIUM_STATE; // current state is now a different range
+        return true;
+      }
+      break;
+    case RETURN_TO_EQUILIBRIUM_STATE:
+      if ((range(36, 38, event.orientation.x)) && 
+          (range(-38, -36, event.orientation.y)) && 
+          (range(89,91, event.orientation.z))) {
+        current_state = EQUILIBRIUM_STATE; // current state is now a different range
+        return true;
+      }
+      break;
+  }
+}
+
+// direction_of_movement():
+// This function takes the old event and compares it to the current event to dictate orientation 
+int direction_of_movement(sensors_event_t event, sensors_event_t old_event) {
+  if ((range(359,360, old_event.orientation.x)) || (range(0, 1, old_event.orientation.x))) { // if the range loops from 360 to 0 or 0 to 360 it's an odd case
+    if (old_event.orientation.x - event.orientation.x > 0) return 1;
+    else return -1;
+  }
+  else if (old_event.orientation.x - event.orientation.x < 0) return 1;
+  else return -1;
+}
+
+// increase_motor_speed():
+// Takes the specified active tensile element and the antagonistic pair will loosen as one contracts. 
 void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
-                          uint8_t motor_direction_b, int motor_speed) { //( direction, motor)
-  switch(motor_number){
+                          uint8_t motor_direction_b, int motor_speed) {
+  switch(motor_number) { // Specifies which motor we are actuating
     case ILIOPSOAS_MOTOR_NUMBER:
-//      Serial.print("hip flex forward");
       iliopsoas_motor->run(motor_direction_f); //FORWARD, then backward 
-      gluteus_motor->run(motor_direction_b);//BACKWARD, then forward  <------------SAME DIRECTION NOW
+      gluteus_motor->run(motor_direction_b);//BACKWARD, then forward
       hamstring_motor->run(motor_direction_f); // mimic the back to slowly release hamstring
-      
-//      Serial.print("increasing motor speed");
-      for(i=0;i<motor_speed;i++){
-       iliopsoas_motor->setSpeed(i*1.2); //front hip motor pulls forward. 
-       //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF REAR
-       gluteus_motor->setSpeed(i*.30); //rear hip motor releases simultaneously with front x2 to increase speed
-       //run to is slowly enxtend knee forward will flexing hip
-       hamstring_motor->setSpeed(i*.70);
-       
-       //delay(5);  
+      for (i = 0; i < motor_speed; i++) {
+        iliopsoas_motor->setSpeed(i * 1.2); //front hip motor pulls forward. 
+        gluteus_motor->setSpeed(i * .30); //rear hip motor releases simultaneously with front x2 to increase speed
+        hamstring_motor->setSpeed(i * .70); //run to is slowly enxtend knee forward will flexing hip
+        delay(5);
       }
       break;   
     
     case GLUTE_MOTOR_NUMBER:
-//      Serial.print("hip flex backwards");
-      gluteus_motor->run(motor_direction_b);  //fix later
-      iliopsoas_motor->run(motor_direction_f);  //fix later
-
-      //slowly run hip motor to lightly tight cable
-      hamstring_motor->run(motor_direction_f);//same as front hip
-//      Serial.print("increasing motor speed");
-      for(i=0;i<motor_speed;i++){
-        //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
-       iliopsoas_motor->setSpeed(i*.40);//new
-       hamstring_motor->setSpeed(i*.65);
-       gluteus_motor->setSpeed(i);
-       
-      // delay(5);
-       
+      gluteus_motor->run(motor_direction_b);
+      iliopsoas_motor->run(motor_direction_f); //slowly run hip motor to lightly tight cable
+      hamstring_motor->run(motor_direction_f); //same as front hip
+      for (i = 0; i < motor_speed; i++) {
+        iliopsoas_motor->setSpeed(i * .40); //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
+        hamstring_motor->setSpeed(i * .65);
+        gluteus_motor->setSpeed(i);
+        delay(5);
       }
       break;
     
     case HAMSTRING_MOTOR_NUMBER:
-//      Serial.print("knee flex backwards");
-      hamstring_motor->run(motor_direction_f); //fix later
-//      Serial.print("increasing motor speed");
-      for(i=0;i<motor_speed;i++){
-       hamstring_motor->setSpeed(i*.80); //new just need to be i, 255 is max value and it will reach there afterwards
-       delay(5);
+      hamstring_motor->run(motor_direction_f);
+      for (i = 0; i < motor_speed; i++) {
+        hamstring_motor->setSpeed(i * .80);
+        delay(5);
       }
       break;
       
     default:
       break;
     
-  }//end of switch
-}//end of increase_motor_speed------------------------------------------
+  }
+}
 
-
-//====DECREASE MOTOR SPEED==============================================
-//motor speed ranges from 0-255
+// decrease_motor_speed():
+// Takes the specified active tensile element and decreases the current applied slowly to an eventual halt. 
 void decrease_motor_speed(int motor_number, uint8_t motor_direction) { 
-    switch(motor_number){
-    case ILIOPSOAS_MOTOR_NUMBER:
-    //CHECK TO SEE IF MOTOR DIRECTION HERE MATTERS
       iliopsoas_motor->run(motor_direction);
-//      Serial.print("decreasing front hip motor speed");
-      for(i=10; i!=0; i--){
-      	iliopsoas_motor->setSpeed(i);
-      	gluteus_motor->setSpeed(i); //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF REAR
-      	delay(5);
-      }
-      break;
-    
-    case GLUTE_MOTOR_NUMBER:
       gluteus_motor->run(motor_direction);
-//      Serial.print("decreasing back hip motor speed");
-      for(i=10; i!=0; i--) {
-      	//new addition
-      	iliopsoas_motor->setSpeed(i); // IF YOU CALL BACKWARD FLEXION, REDUCE SPEED OF FRONT MOTOR   
+      hamstring_motor->run(motor_direction);
+      for(i = 10; i != 0; i--) { // slowly discharge motors to stop
+      	iliopsoas_motor->setSpeed(i);
       	gluteus_motor->setSpeed(i);
       	hamstring_motor->setSpeed(i);      
       	delay(5);
       }
-      break;
-    case HAMSTRING_MOTOR_NUMBER:
-      hamstring_motor->run(motor_direction);
-//      Serial.print("decreasing hamstring motor speed");
-      for(i=10; i!=0; i--) {
-      	iliopsoas_motor->setSpeed(i); // IF YOU CALL BACKWARD FLEXION, REDUCE SPEED OF FRONT MOTOR   
-      	gluteus_motor->setSpeed(i); 
-      	hamstring_motor->setSpeed(i);
-      	delay(5);
-      }
-      break;
-  }//end of switch
-}//end of decrease_motor_speed()--------------------------------------
+  }
+}
 
-//==FLEX=KNEE============================================================================
-void knee_flex(uint8_t motor_direction_f, uint8_t motor_direction_b, int speed){
-  Serial.println("Flexing knee backwards");
-  increase_motor_speed(HAMSTRING_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed);
-//  decrease_motor_speed(HAMSTRING_MOTOR_NUMBER, motor_direction_f);
-}//end of knee_flex----------------------------------------------------------------------
+// knee_flex():
+// Flexes the knee backwards at a specified speed. 
+void knee_flex(uint8_t motor_direction_f, uint8_t motor_direction_b, int speed) {
+  Serial.println("Heel lift up.");
+  increase_motor_speed(HAMSTRING_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed); // specifies the speed/direction pattern of active tensile elements
+}
 
-//==STOP MOTION==========================================================================
+// extend_forward():
+// Flexes the knee backwards at a specified speed. 
+void extend_forward(uint8_t motor_direction_f, uint8_t motor_direction_b, int speed) {
+  Serial.println("Extending leg forwards.");
+  increase_motor_speed(ILIOPSOAS_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed); // specifies the speed/direction pattern of active tensile elements
+}
+
+// extend_forward_release():
+// Flexes the knee backwards at a specified speed. 
+void extend_forward_release(uint8_t motor_direction_f, uint8_t motor_direction_b, int speed) {
+  Serial.println("Release hamstring.");
+  increase_motor_speed(ILIOPSOAS_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed); // specifies the speed/direction pattern of active tensile elements
+}
+
+// follow_through():
+// Flexes the knee backwards at a specified speed. 
+void follow_through(uint8_t motor_direction_f, uint8_t motor_direction_b, int speed) {
+  Serial.println("Stepping through.");
+  increase_motor_speed(ILIOPSOAS_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed); // specifies the speed/direction pattern of active tensile elements
+}
+
+// return_equilibrium():
+// Flexes the knee backwards at a specified speed. 
+void return_equilibrium(uint8_t motor_direction_f, uint8_t motor_direction_b, int speed) {
+  Serial.println("Return to beginning.");
+  increase_motor_speed(ILIOPSOAS_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed); // specifies the speed/direction pattern of active tensile elements
+}
+
+// stop_motion():
+// Stops all active tensile elements. 
 void stop_motion() {
-	iliopsoas_motor->run(BRAKE);
+	iliopsoas_motor->run(BRAKE); // Halt the Iliopsoas active tensile element
 	iliopsoas_motor->setSpeed(0);
-	gluteus_motor->run(BRAKE);
+	gluteus_motor->run(BRAKE); // Halt the Gluteus active tensile element
 	gluteus_motor->setSpeed(0);
-	hamstring_motor->run(BRAKE);
+	hamstring_motor->run(BRAKE); // Halt the Hamstring active tensile element
 	hamstring_motor->setSpeed(0);
+  delay(100); // discharge all current through motors
 }
 
 //====END OF HELPER FUNCTIONS==============================================
@@ -177,31 +237,32 @@ void stop_motion() {
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  
+
   AFMS.begin();  // create with the default frequency 1.6KHz
   //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
+  
   if(!lower_leg_tracker.begin())
   {
-    /* There was a problem detecting the BNO055 ... check your connections */
-    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!"); // There was a problem detecting the BNO055 ... check your connections
     while(1);
   }
-  
   lower_leg_tracker.setExtCrystalUse(true);
   
-//  pinMode(BUTTON, INPUT); // initialize the switch pin as an input
-  //digitalWrite(button_pin, High); //Turn on Internal pull-up 
-
   Serial.println("Setup complete.");
 }
 
 void loop() {
-	if (Serial.available() > 0) {
+  /* Get a new sensor event */
+  sensors_event_t event;
+  lower_leg_tracker.getEvent(&event);
+
+	if (Serial.available() > 0) { // if serial input is ready to read input
 		input = Serial.readString();
     command = input[0];
 		switch (command) {
 			case 's': //s for start
 				Serial.print("Starting leg motion.");
+        current_state = HEEL_LIFT_STATE;
 				knee_flex(FORWARD, BACKWARD, 120);
 				break;
 			case 'x': // x for exit
@@ -211,19 +272,46 @@ void loop() {
 		}
 	}
 
-	/* Get a new sensor event */
-    sensors_event_t event;
-    lower_leg_tracker.getEvent(&event);
-    if (event.orientation.x >= target_theta) {
-    	stop_motion();
-    }
-   Serial.print(event.orientation.x, 4);
-   Serial.print("\tY: ");
-   Serial.print(event.orientation.y, 4);
-   Serial.print("\tZ: ");
-   Serial.println(event.orientation.z, 4); 
-   delay(BNO055_SAMPLERATE_DELAY_MS);
+  switch (current_state) {
+    case HEEL_LIFT_STATE:
+      if (point_reached) {
+        stop_motion();
+        extend_forward(BACKWARD, FORWARD, 200);
+      }
+      break;
+    case EXTENSION_FORWARD_STATE:
+      if (point_reached) {
+        stop_motion();
+        extend_forward(BACKWARD, FORWARD, 200);
+      }
+      break;
+    case EXTENSION_FORWARD_STATE_PART_2:
+      if (point_reached) {
+        stop_motion();
+        follow_through(BACKWARD, FORWARD, 200);
+      }
+      break;
+    case FOLLOW_THROUGH_STATE:
+      if (point_reached) {
+        stop_motion();
+        return_equilibrium(BACKWARD, FORWARD, 200);
+      }
+      break;
+    case RETURN_TO_EQUILIBRIUM_STATE:
+      if (point_reached) {
+        stop_motion();
+      }
+      break;
+  }
 
+  // Constantly print out the gyroscopic readings from the BNO055
+  // Serial.print(event.orientation.x, 4);
+  // Serial.print("\tY: ");
+  // Serial.print(event.orientation.y, 4);
+  // Serial.print("\tZ: ");
+  // Serial.println(event.orientation.z, 4); 
+  old_event = event;
+  delay(BNO055_SAMPLERATE_DELAY_MS);
 }
 
 

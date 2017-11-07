@@ -1,0 +1,14 @@
+Rough estimates from current leg gait program
+END OF STAGE 1		 	| X: 359.9375		Y: -76.3125		Z: 78.4375
+END OF STAGE 2			| X: 331.0000		Y: -78.0000		Z: -77.6250
+END OF STAGE 2 PART 2	| X: 331.4375		Y: -78.3750		Z: -75.5625
+END OF STAGE 3			| X: 19.1875		Y: -57.6250		Z: 87.5000
+END OF STAGE 4			| X: 37.6875		Y: -37.0625		Z: 90.5000
+
+Case where in between: 
+* Old = 5 new = 45 (+)
+* Old = 45 new 5 (-)
+* Old = 360 new = 0.6 (+)
+* Old = 0.6 new 360 (-)
+* Old = 340 new = 355 (-)
+* Old = 355 new = 340 (+)

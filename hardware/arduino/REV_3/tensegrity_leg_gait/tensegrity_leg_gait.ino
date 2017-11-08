@@ -7,18 +7,9 @@
 
  
 ///==========================================================================================================
-//Current Version 6: Right now the front motor will pull up the leg, while it's doing to the rear 
-// motor will release the cable simultaneously. After that, the front motor releases the leg, and
-// the rear cable tightens up
-//      1)Trying to get hip to flex back. The rear motor will pull counter clockwise (BACKWARDS)
-//        The front motor will release (FORWARDS). And then return to stationary positon.
-//       2)Tighten front hip motor (BACKWARDS), stop, run hamstring motor (FORWARD) til 90 degrees of flexion.
-//        Then run hamstring motor (Backwards) until neutral, and then loosen up front motor (FORWARDS).           
-//
-//Work in progress: --------------------------------------------------------------------------------------
-//    Getting the robotic leg to simulate gait
-//
-//--------------------------------------------------------------------------------------------------------
+//Current Version 8: 1 cycle of gait is completed once the button is pressed
+
+
 
 /* 
  * Include all libraries needed to properly run program
@@ -90,52 +81,67 @@ Adafruit_BNO055 bno = Adafruit_BNO055(55);
  * increase, decrease, etc.
  */
 //====INCREASE MOTOR SPEED==========================================================
+/*
+ * NOTE to user: When you see i*(some arbitrary value) just  know that the purpose of
+ * that is to slow down the rate at which the motor increases its speed, but the 
+ * motor will eventually reach it's maximum (the desired speed that the user passed to the 
+ * increase_motor_speed(...)'s arguments.
+*/
 void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
                           uint8_t motor_direction_b, int motor_speed) { //( direction, motor)
   switch(motor_number){
+
+    //Flex Hip Forward
+    //  Make sure to adjust the rear hip motor accordingly to match the speed of the front motor
+    //  to avoid straining the motor
     case 1:
       Serial.print("hip flex forward");
+      //The direction of spin depends on the orientation of the motors, either change
+      // it here or manually change motor (at your discretion)
       f_hip_motor->run(motor_direction_f); //FORWARD, then backward 
-      b_hip_motor->run(motor_direction_b);//BACKWARD, then forward  <------------SAME DIRECTION NOW
-      hamstring_motor->run(motor_direction_f); // mimic the back to slowly release hamstring
+      b_hip_motor->run(motor_direction_b); //BACKWARD, then forward  
+      hamstring_motor->run(motor_direction_f); // mimic the Rear motor, by slowly releasing hamstring
       
       Serial.print("increasing motor speed");
       for(i=0;i<motor_speed;i++){
-       f_hip_motor->setSpeed(i*1.2); //front hip motor pulls forward. 
-       //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF REAR
-       b_hip_motor->setSpeed(i*.30); //rear hip motor releases simultaneously with front x2 to increase speed
-       //run to is slowly enxtend knee forward will flexing hip
-       hamstring_motor->setSpeed(i*.70);
+       f_hip_motor->setSpeed(i*1.2); //front hip motor pulls forward, adjust speed according to preference 
+       b_hip_motor->setSpeed(i*.30); //rear hip motor releases simultaneously with front at 30% of the speed inputted
+       hamstring_motor->setSpeed(i*.70);//run to slowly enxtend knee forward will flexing hip
        
        //delay(5);  
       }
       break;   
     
+    //Flex Hip Backward
+    //  Make sure to adjust the front hip motor accordingly to match the speed of the reart motor
+    //  to avoid straining the motor
     case 2:
       Serial.print("hip flex backwards");
-      b_hip_motor->run(motor_direction_b);  //fix later
-      f_hip_motor->run(motor_direction_f);  //fix later
-
-      //slowly run hip motor to lightly tight cable
-      hamstring_motor->run(motor_direction_f);//same as front hip
+      b_hip_motor->run(motor_direction_b); //Adjust hip motor if it doesn't release properly
+      f_hip_motor->run(motor_direction_f); // Rear motor should always be the opposite of the ront
+      hamstring_motor->run(motor_direction_f);// Should be same direction as the front hip,
+                                              // if not, then use the rear motors direction
+                                              //NOTE: it just depends how the motor are set up.
+                                              
       Serial.print("increasing motor speed");
-      for(i=0;i<motor_speed;i++){
-        //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
-       f_hip_motor->setSpeed(i*.40);//new
-       hamstring_motor->setSpeed(i*.65);
-       b_hip_motor->setSpeed(i);
-       
-      // delay(5);
-       
+      //IF YOU CALL BACKWARD FLEXION, REDUCE SPEED OF FRONT
+      //to prevent from tangling messy cable release
+        for(i=0;i<motor_speed;i++){
+         f_hip_motor->setSpeed(i*.40);//new
+         hamstring_motor->setSpeed(i*.65);
+         b_hip_motor->setSpeed(i);
       }
       break;
     
     case 3:
+    //Flex Just the Hamstring, Backwards
+    //  Make sure to adjust the rear hip motor accordingly to match the speed of the front motor
+    //  Make that front hip cable is taught, so just the hamstring will flex.
       Serial.print("knee flex backwards");
-      hamstring_motor->run(motor_direction_f); //fix later
+      hamstring_motor->run(motor_direction_f); 
       Serial.print("increasing motor speed");
       for(i=0;i<motor_speed;i++){
-       hamstring_motor->setSpeed(i*.80); //new just need to be i, 255 is max value and it will reach there afterwards
+       hamstring_motor->setSpeed(i*.80);
        delay(5);
       }
       break;
@@ -153,6 +159,9 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
     switch(motor_number){
     case 1:
     //CHECK TO SEE IF MOTOR DIRECTION HERE MATTERS
+    //The direction to slow the motor down is the same as the 
+    // direction passed in for the increase_motor_speed()
+    // just refer to that.
       f_hip_motor->run(motor_direction);
       Serial.print("decreasing front hip motor speed");
       for(i=10; i!=0; i--){
@@ -189,12 +198,12 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
 
 
 //===FLEX=HIP=========================================================
-//distance,direction, motor
+//Enter Distance(duraction of motor run), desired motor, front motor direction,back motor direction, 0-255)
 //(1=>forward, 2=>backwards)
-void hip_flex(int distance, int motor_number, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){  //40% motorspeed
+void hip_flex(int distance, int motor_number, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){ 
   
   Serial.println("Flexing hip");
-  increase_motor_speed(motor_number,motor_direction_f, motor_direction_b,motor_speed); //calls this fuctions and passes parameters
+  increase_motor_speed(motor_number,motor_direction_f, motor_direction_b,motor_speed); 
   delay(distance*fact);
   decrease_motor_speed(motor_number,motor_direction_f);
   decrease_motor_speed(3, motor_direction_b);

@@ -1,7 +1,13 @@
-#include <Adafruit_MotorShield.h>
+// Print libraries
 #include <stdio.h>
+// Motor libraries
+#include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-
+// Gyroscope libraries 
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
 /* 
  * Create the motor shield object with the default I2C address
  * Or, create it with a different I2C address (say for stacking) 
@@ -16,10 +22,37 @@ Adafruit_DCMotor *f_hip_motor     = AFMS.getMotor(1); //hip flex forward motor
 Adafruit_DCMotor *b_hip_motor     = AFMS.getMotor(2); //hip flex rear motor
 Adafruit_DCMotor *hamstring_motor = AFMS.getMotor(3); //knee flex backwards motor
 
+// Set delay between fresh samples
+#define BNO055_SAMPLERATE_DELAY_MS (100)
+Adafruit_BNO055 bno = Adafruit_BNO055();
+
 void setup() {
   Serial.begin(9600);
   Serial.print("Power On. Begin Test.\n");
   AFMS.begin();
+
+  Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
+
+  /* Initialise the sensor */
+  if(!bno.begin())
+  {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    while(1);
+  }
+
+  delay(1000);
+
+  /* Display the current temperature */
+  int8_t temp = bno.getTemp();
+  Serial.print("Current Temperature: ");
+  Serial.print(temp);
+  Serial.println(" C");
+  Serial.println("");
+
+  bno.setExtCrystalUse(true);
+
+  Serial.println("Calibration status values: 0=uncalibrated, 3=fully calibrated");
 }
 
   String input;
@@ -28,6 +61,16 @@ void setup() {
   int    desired_Speed;
 
 void loop() {
+  
+  // Possible vector values can be:
+  // - VECTOR_ACCELEROMETER - m/s^2
+  // - VECTOR_MAGNETOMETER  - uT
+  // - VECTOR_GYROSCOPE     - rad/s
+  // - VECTOR_EULER         - degrees
+  // - VECTOR_LINEARACCEL   - m/s^2
+  // - VECTOR_GRAVITY       - m/s^2
+  imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
+
   if (Serial.available() > 0) {
 
     input              = Serial.readString();
@@ -102,8 +145,19 @@ void loop() {
         hamstring_motor->run(BRAKE);
         hamstring_motor->setSpeed(0);
         delay(5);
+        break;
+      case 'a': //for angle
+        /* Display the floating point data */
+        Serial.print("X: ");
+        Serial.print(euler.x());
+        Serial.print(" Y: ");
+        Serial.print(euler.y());
+        Serial.print(" Z: ");
+        Serial.print(euler.z());
+        Serial.print("\t\t");
     }                                 //end of switch
   }                                   //end of if
   
+  delay(BNO055_SAMPLERATE_DELAY_MS);
 }
 

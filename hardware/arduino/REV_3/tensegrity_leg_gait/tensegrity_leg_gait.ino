@@ -1,5 +1,5 @@
 /*
- * File name: tensegrity_leg_gait_6.ino
+ * File name: tensegrity_leg_gait.ino
  * Authors: Erik Jung and Lawrence Ngo
  * Comments: This a tensegrity knee with newly add hip joint. The purpose of this design is to mimic
  *           human gait. At the moment, the design relies soley on timers for movement.
@@ -7,18 +7,9 @@
 
  
 ///==========================================================================================================
-//Current Version 6: Right now the front motor will pull up the leg, while it's doing to the rear 
-// motor will release the cable simultaneously. After that, the front motor releases the leg, and
-// the rear cable tightens up
-//      1)Trying to get hip to flex back. The rear motor will pull counter clockwise (BACKWARDS)
-//        The front motor will release (FORWARDS). And then return to stationary positon.
-//       2)Tighten front hip motor (BACKWARDS), stop, run hamstring motor (FORWARD) til 90 degrees of flexion.
-//        Then run hamstring motor (Backwards) until neutral, and then loosen up front motor (FORWARDS).           
-//
-//Work in progress: --------------------------------------------------------------------------------------
-//    Getting the robotic leg to simulate gait
-//
-//--------------------------------------------------------------------------------------------------------
+//Current Version 8: 1 cycle of gait is completed once the button is pressed
+
+
 
 /* 
  * Include all libraries needed to properly run program
@@ -30,7 +21,9 @@
 #include <Adafruit_MotorShield.h>
 #include <stdio.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
 // ------------------------------------------------------
 
 /*
@@ -40,9 +33,18 @@
 #define THERMISTORPIN A0 // the pin to connect the sensor 
 #define STARTPOSITION 0
 #define PEAKFLEXIONSTATE 1
+#define STATE1 1
+#define STATE2 2
+#define STATE3 3
+#define STATE4 4
+#define STATE5 5
+#define STATE_FINISHED 6
 #define UNFLEXSTATE 2
 #define HAMSTRING_MOTOR 3
+#define BNO055_SAMPLERATE_DELAY_MS (100) /* Set the delay between fresh samples */
 
+
+int leg_state;
 const int button_pin = 2; // the number of the switch pin
 int button_state = 0; // this will change based on the state of the push button status
 int flexed_state = 0; // tells us if the leg has flexed
@@ -72,60 +74,74 @@ Adafruit_DCMotor *f_hip_motor = AFMS.getMotor(1);  //hip flex forward motor
 Adafruit_DCMotor *b_hip_motor = AFMS.getMotor(2);  //hip flex rear motor
 Adafruit_DCMotor *hamstring_motor = AFMS.getMotor(3); // knee flex backwards motor
 
-
-
+Adafruit_BNO055 bno = Adafruit_BNO055(55);
 
 //=================================================================
 /* Helper functions to make the main code look cleaner:
  * increase, decrease, etc.
  */
 //====INCREASE MOTOR SPEED==========================================================
+/*
+ * NOTE to user: When you see i*(some arbitrary value) just  know that the purpose of
+ * that is to slow down the rate at which the motor increases its speed, but the 
+ * motor will eventually reach it's maximum (the desired speed that the user passed to the 
+ * increase_motor_speed(...)'s arguments.
+*/
 void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
                           uint8_t motor_direction_b, int motor_speed) { //( direction, motor)
   switch(motor_number){
+
+    //Flex Hip Forward
+    //  Make sure to adjust the rear hip motor accordingly to match the speed of the front motor
+    //  to avoid straining the motor
     case 1:
       Serial.print("hip flex forward");
+      //The direction of spin depends on the orientation of the motors, either change
+      // it here or manually change motor (at your discretion)
       f_hip_motor->run(motor_direction_f); //FORWARD, then backward 
-      b_hip_motor->run(motor_direction_b);//BACKWARD, then forward  <------------SAME DIRECTION NOW
-      hamstring_motor->run(motor_direction_f); // mimic the back to slowly release hamstring
+      b_hip_motor->run(motor_direction_b); //BACKWARD, then forward  
+      hamstring_motor->run(motor_direction_f); // mimic the Rear motor, by slowly releasing hamstring
       
       Serial.print("increasing motor speed");
       for(i=0;i<motor_speed;i++){
-       f_hip_motor->setSpeed(i*1.2); //front hip motor pulls forward. 
-       //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF REAR
-       b_hip_motor->setSpeed(i*.30); //rear hip motor releases simultaneously with front x2 to increase speed
-       //run to is slowly enxtend knee forward will flexing hip
-       hamstring_motor->setSpeed(i*.70);
+       f_hip_motor->setSpeed(i*1.2); //front hip motor pulls forward, adjust speed according to preference 
+       b_hip_motor->setSpeed(i*.30); //rear hip motor releases simultaneously with front at 30% of the speed inputted
+       hamstring_motor->setSpeed(i*.70);//run to slowly enxtend knee forward will flexing hip
        
        //delay(5);  
       }
       break;   
     
+    //Flex Hip Backward
+    //  Make sure to adjust the front hip motor accordingly to match the speed of the reart motor
+    //  to avoid straining the motor
     case 2:
       Serial.print("hip flex backwards");
-      b_hip_motor->run(motor_direction_b);  //fix later
-      f_hip_motor->run(motor_direction_f);  //fix later
-
-      //slowly run hip motor to lightly tight cable
-      hamstring_motor->run(motor_direction_f);//same as front hip
+      b_hip_motor->run(motor_direction_b); //Adjust hip motor if it doesn't release properly
+      f_hip_motor->run(motor_direction_f); // Rear motor should always be the opposite of the ront
+      hamstring_motor->run(motor_direction_f);// Should be same direction as the front hip,
+                                              // if not, then use the rear motors direction
+                                              //NOTE: it just depends how the motor are set up.
+                                              
       Serial.print("increasing motor speed");
-      for(i=0;i<motor_speed;i++){
-        //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
-       f_hip_motor->setSpeed(i*.40);//new
-       hamstring_motor->setSpeed(i*.65);
-       b_hip_motor->setSpeed(i);
-       
-      // delay(5);
-       
+      //IF YOU CALL BACKWARD FLEXION, REDUCE SPEED OF FRONT
+      //to prevent from tangling messy cable release
+        for(i=0;i<motor_speed;i++){
+         f_hip_motor->setSpeed(i*.40);//new
+         hamstring_motor->setSpeed(i*.65);
+         b_hip_motor->setSpeed(i);
       }
       break;
     
     case 3:
+    //Flex Just the Hamstring, Backwards
+    //  Make sure to adjust the rear hip motor accordingly to match the speed of the front motor
+    //  Make that front hip cable is taught, so just the hamstring will flex.
       Serial.print("knee flex backwards");
-      hamstring_motor->run(motor_direction_f); //fix later
+      hamstring_motor->run(motor_direction_f); 
       Serial.print("increasing motor speed");
       for(i=0;i<motor_speed;i++){
-       hamstring_motor->setSpeed(i*.80); //new just need to be i, 255 is max value and it will reach there afterwards
+       hamstring_motor->setSpeed(i*.80);
        delay(5);
       }
       break;
@@ -143,6 +159,9 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
     switch(motor_number){
     case 1:
     //CHECK TO SEE IF MOTOR DIRECTION HERE MATTERS
+    //The direction to slow the motor down is the same as the 
+    // direction passed in for the increase_motor_speed()
+    // just refer to that.
       f_hip_motor->run(motor_direction);
       Serial.print("decreasing front hip motor speed");
       for(i=10; i!=0; i--){
@@ -179,11 +198,12 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
 
 
 //===FLEX=HIP=========================================================
-//distance,direction, motor
+//Enter Distance(duraction of motor run), desired motor, front motor direction,back motor direction, 0-255)
 //(1=>forward, 2=>backwards)
-void hip_flex(int distance, int motor_number, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){  //40% motorspeed
+void hip_flex(int distance, int motor_number, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){ 
+  
   Serial.println("Flexing hip");
-  increase_motor_speed(motor_number,motor_direction_f, motor_direction_b,motor_speed); //calls this fuctions and passes parameters
+  increase_motor_speed(motor_number,motor_direction_f, motor_direction_b,motor_speed); 
   delay(distance*fact);
   decrease_motor_speed(motor_number,motor_direction_f);
   decrease_motor_speed(3, motor_direction_b);
@@ -229,13 +249,21 @@ void setup() {
   
   AFMS.begin();  // create with the default frequency 1.6KHz
   //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
+  if(!bno.begin())
+  {
+    /* There was a problem detecting the BNO055 ... check your connections */
+    Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+    while(1);
+  }
 
-  
+  bno.setExtCrystalUse(true);
  
   hamstring_motor->setSpeed(0); // Set the speed to start, from 0 (off) to 255 (max speed)
   hamstring_motor->run(FORWARD);
   hamstring_motor->run(RELEASE); // turn on motor
- 
+  
+  
+  
   pinMode(button_pin, INPUT); // initialize the switch pin as an input
   //digitalWrite(button_pin, High); //Turn on Internal pull-up 
 }
@@ -251,37 +279,92 @@ void loop() {
   delay(10); //refreashing time constant
   
   button_state = digitalRead(button_pin); // read the state of the switch value
-
-
-  
+  sensors_event_t event;
+  bno.getEvent(&event);
 //---WALKING-GAIT-ALGORITHM-----------------------------------------------------------------
- if (button_state == HIGH) {
-  
+  if (button_state == HIGH) {
+    leg_state = STATE1;
+  }
     //====FIRST_STEP=====//
     //flex hamstring to bring knee slightly up
-    knee_flex(4500, FORWARD, BACKWARD);
-    delay(10);
-    //bring hip forward
-    //pull front cable  (distance, motor number, f_motor_direction, b_motor_direct, speed)
-    hip_flex(4000, 1, BACKWARD, FORWARD,200);  //ORGINALLY 4000 AND 4500 3:26PM
-    delay(10);
-
-    //====FOLLOW-THROUGH===//
-//    //bring leg back to neutral then past continue swinging back 
-    hip_flex(6000, 2, FORWARD, BACKWARD, 120);  
-    delay(10);
-  //-------Calling separate file hip_flex_knee in place
+  //RETURN KNEE BACK TO NEUTRAL    
+  if (leg_state == STATE5) {
+    knee_flex(2700, BACKWARD, FORWARD);
+    /* Get a new sensor event */
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS);
+    leg_state = STATE_FINISHED;
+  }
 
    // void knee_inplace(int distance, uint8_t motor_direction_f, uint8_t motor_direction_b, int motor_speed){
+  if (leg_state == STATE4) {
     knee_inplace(40, BACKWARD,FORWARD,170);
-    
-  //RETURN KNEE BACK TO NEUTRAL    
-    knee_flex(2700, BACKWARD, FORWARD);
+    /* Get a new sensor event */
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS);
+    leg_state = STATE5;
+  }
+  //====FOLLOW-THROUGH===//
+  //    //bring leg back to neutral then past continue swinging back 
+  if (leg_state == STATE3) {
+    hip_flex(6000, 2, FORWARD, BACKWARD, 120); 
+    /* Get a new sensor event */
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS); 
+    leg_state = STATE4;
+  }
+  //bring hip forward
+  //pull front cable  (distance, motor number, f_motor_direction, b_motor_direct, speed)
+  if (leg_state == STATE2) {
+    hip_flex(4000, 1, BACKWARD, FORWARD,200);  //ORGINALLY 4000 AND 4500 3:26PM
+    /* Get a new sensor event */
+    bno.getEvent(&event);
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS);
+    leg_state = STATE3;
+  }
+
+  if (leg_state == STATE1) {
+    knee_flex(4500, FORWARD, BACKWARD);
+    /* Get a new sensor event */
+  
+    Serial.print("X: ");
+    Serial.print(event.orientation.x, 4);
+    Serial.print("\tY: ");
+    Serial.print(event.orientation.y, 4);
+    Serial.print("\tZ: ");
+    Serial.println(event.orientation.z, 4); 
+    delay(BNO055_SAMPLERATE_DELAY_MS);
     delay(10);
+    leg_state = STATE2;
+  }
+
+  //-------Calling separate file hip_flex_knee in place
+
 
 
     
-  }//-----------END OF button_state if statement--------!!
+//  }//-----------END OF button_state if statement--------!!
 
 
 }//===================end of loop , END OF PROGRAM=================================

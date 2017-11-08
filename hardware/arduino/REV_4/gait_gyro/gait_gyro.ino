@@ -64,7 +64,7 @@ Adafruit_BNO055 lower_leg_tracker = Adafruit_BNO055(55);
 
 // range():
 // Simple function that tells us if we're within the boundaries of what we expect our value to be within.
-bool range(float min, float max, float i) {
+bool range(float min,float max,float i) {
   return min <= i  && i < max; 
 }
 
@@ -257,13 +257,14 @@ void setup() {
   AFMS.begin();  // create with the default frequency 1.6KHz
   //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
   
-  if(!lower_leg_tracker.begin())
-  {
+  if(!lower_leg_tracker.begin()) {
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!"); // There was a problem detecting the BNO055 ... check your connections
     while(1);
   }
   lower_leg_tracker.setExtCrystalUse(true);
   
+  current_state = EQUILIBRIUM_STATE; // Starting from equilibrium
+
   Serial.println("Setup complete.");
 }
 
@@ -298,7 +299,7 @@ void loop() {
     case EXTENSION_FORWARD_STATE:
       if (point_reached(event)) {
         stop_motion();
-        extend_forward(BACKWARD, FORWARD, 200);
+        extend_forward_release(BACKWARD, FORWARD, 200);
       }
       break;
     case EXTENSION_FORWARD_STATE_PART_2:

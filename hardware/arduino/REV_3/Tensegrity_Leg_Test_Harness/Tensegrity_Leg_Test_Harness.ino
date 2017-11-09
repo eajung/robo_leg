@@ -1,9 +1,30 @@
-// Print libraries
+/*This program is for testing the motors on the tensegrity flexural joint by individually controlling every motor
+ * With different hotkeys. Moreover, each motor can be set at a particular speed. Note that there is a small delay
+ * with pressing return in the Serial TX side and the motors following through.
+ * 
+ * The format for the transmission is as follows:
+ * desired_Motor,speed with NO spaces!
+ * 
+ * The hotkeys for the motors are as follows:
+ * f: hip motor forward
+ * b: hip motor backward
+ * g: rear hip motor forward
+ * n: rear hip motor backward
+ * h: hamstring motor forward
+ * m: hamstring motor backward
+ * 
+ * The speeds for the motors can range from 0 to 255.
+ * 
+ * Lastly, the s hotkey at any point will cease all motor activity
+ * and the a hotkey will print out the current gyro reading.
+ */
+ 
+//Print libraries
 #include <stdio.h>
-// Motor libraries
+//Motor libraries
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-// Gyroscope libraries 
+//Gyroscope libraries 
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BNO055.h>
@@ -27,9 +48,9 @@ Adafruit_DCMotor *hamstring_motor = AFMS.getMotor(3); //knee flex backwards moto
 Adafruit_BNO055 bno = Adafruit_BNO055();
 
 void setup() {
-  Serial.begin(9600);
-  Serial.print("Power On. Begin Test.\n");
-  AFMS.begin();
+  Serial.begin(9600); //Set the baud rate
+  Serial.print("Power On. Begin Test.\n"); //Inform user that test is starting
+  AFMS.begin(); //begin
 
   Serial.println("Orientation Sensor Raw Data Test"); Serial.println("");
 
@@ -70,19 +91,23 @@ void loop() {
   // - VECTOR_LINEARACCEL   - m/s^2
   // - VECTOR_GRAVITY       - m/s^2
   imu::Vector<3> euler = bno.getVector(Adafruit_BNO055::VECTOR_EULER);
-
+  
+  /*if there is data in the serial transmit side, read and process it */
   if (Serial.available() > 0) {
 
+    /*parse through the transmit side string */
     input              = Serial.readString();
     commaIndex         = input.indexOf(',');
     String firstValue  = input.substring(0, commaIndex);
     String secondValue = input.substring(commaIndex+1);
 
+    /*set the desired motor and the desired speed */
     desired_Motor      = firstValue[0];
     desired_Speed      = secondValue.toInt();
 
+    /*switch statement covering all hotkey cases */
     switch (desired_Motor) {
-      case 'f':
+      case 'f': //HOTKEY = f, move front hip forward
         Serial.print("Move front hip forward, ");
         Serial.println(desired_Speed);
         f_hip_motor->run(BACKWARD);
@@ -91,7 +116,7 @@ void loop() {
         }
         delay(5);
         break;
-      case 'b':
+      case 'b': //HOTKEY = b, move front hip backward
         Serial.print("Move front hip backward, ");
         Serial.println(desired_Speed);
         f_hip_motor->run(FORWARD);
@@ -100,7 +125,7 @@ void loop() {
         }
         delay(5);
         break;
-      case 'g':
+      case 'g': //HOTKEY = g, move rear hip forward
         Serial.print("Move back hip forward, ");
         Serial.println(desired_Speed);
         b_hip_motor->run(FORWARD);
@@ -109,7 +134,7 @@ void loop() {
         }
         delay(5);
         break;
-      case 'n':
+      case 'n': //HOTKEY = n, move rear hip backward
         Serial.print("Move back hip backward, ");
         Serial.println(desired_Speed);
         b_hip_motor->run(BACKWARD);
@@ -118,7 +143,7 @@ void loop() {
         }
         delay(5);
         break;
-      case 'h':
+      case 'h': //HOTKEY = h, move hamstring forward
         Serial.print("Move hamstring forward, ");
         Serial.println(desired_Speed);
         hamstring_motor->run(FORWARD);
@@ -127,7 +152,7 @@ void loop() {
         }
         delay(5);
         break;
-      case 'm':
+      case 'm': //HOTKEY = m, move hamstring backward
         Serial.print("Move hamstring backward, ");
         Serial.println(desired_Speed);
         hamstring_motor->run(BACKWARD);
@@ -136,7 +161,7 @@ void loop() {
         }
         delay(5);
         break;
-      case 's':
+      case 's': //HOTKEY = s, stop all motor activity
         Serial.print("Stop\n");
         f_hip_motor->run(BRAKE);
         f_hip_motor->setSpeed(0);
@@ -146,7 +171,7 @@ void loop() {
         hamstring_motor->setSpeed(0);
         delay(5);
         break;
-      case 'a': //for angle
+      case 'a': //HOTKEY = a, print gyro information
         /* Display the floating point data */
         Serial.print("X: ");
         Serial.print(euler.x());

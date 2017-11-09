@@ -64,7 +64,7 @@ Adafruit_BNO055 lower_leg_tracker = Adafruit_BNO055(55);
 
 // range():
 // Simple function that tells us if we're within the boundaries of what we expect our value to be within.
-bool range(float min, float max, float i) {
+bool range(float min,float max,float i) {
   return min <= i  && i < max; 
 }
 
@@ -77,17 +77,27 @@ bool targeted_bounds(sensors_event_t event) {
           (range(target_theta_z_low, target_theta_z_high, event.orientation.z)));
 }
 
+// targeted_bounds_x():
+// Exactly like target_bounds() but only in the x-plane
+// Returns true if the gyroscope is within the designated bounds set for the next stage
+bool targeted_bounds_x(sensors_event_t event) {
+  return (range(target_theta_x_low, target_theta_x_high, event.orientation.x));
+}
+
 // point_reached():
 // By taking the readings from the gyroscope and the given current_state of our system, we return 
 // true if the orientation of the gyroscope has reached the specified angles. 
 bool point_reached(sensors_event_t event) {
   switch (current_state) {
+    
+    // Serial.println("current_state = ", current_state);
     case HEEL_LIFT_STATE: // if we are in the heel lift state
       target_theta_x_low = 358; target_theta_x_high = 360;
       target_theta_y_low = -77; target_theta_y_high = -75;
       target_theta_z_low = 77; target_theta_z_high = 79;
       if (targeted_bounds(event)) {
         current_state = EXTENSION_FORWARD_STATE; // current state is now a different range
+        Serial.println("EXTENSION_FORWARD_STATE");
         return true;
       }
       break;
@@ -97,6 +107,7 @@ bool point_reached(sensors_event_t event) {
       target_theta_z_low = -77.8; target_theta_z_high = -77;
       if (targeted_bounds(event)) {
         current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range
+        Serial.println("EXTENSION_FORWARD_STATE_PART_2");
         return true;
       }
       break;
@@ -106,6 +117,7 @@ bool point_reached(sensors_event_t event) {
       target_theta_z_low = -75.75; target_theta_z_high = -75.25;
       if (targeted_bounds(event)) {
         current_state = FOLLOW_THROUGH_STATE; // current state is now a different range
+        Serial.println("FOLLOW_THROUGH_STATE");
         return true;
       }
       break;
@@ -115,6 +127,7 @@ bool point_reached(sensors_event_t event) {
       target_theta_z_low = 86; target_theta_z_high = 88.5;
       if (targeted_bounds(event)) {
         current_state = EQUILIBRIUM_STATE; // current state is now a different range
+        Serial.println("EQUILIBRIUM_STATE");
         return true;
       }
       break;
@@ -124,6 +137,7 @@ bool point_reached(sensors_event_t event) {
       target_theta_z_low = 89; target_theta_z_high = 91;
       if (targeted_bounds(event)) {
         current_state = EQUILIBRIUM_STATE; // current state is now a different range
+        Serial.println("EQUILIBRIUM_STATE");
         return true;
       }
       break;
@@ -135,11 +149,23 @@ bool point_reached(sensors_event_t event) {
 // This function takes the old event and compares it to the current event to dictate orientation 
 int direction_of_movement(sensors_event_t event, sensors_event_t old_event) {
   if ((range(359,360, old_event.orientation.x)) || (range(0, 1, old_event.orientation.x))) { // if the range loops from 360 to 0 or 0 to 360 it's an odd case
-    if (old_event.orientation.x - event.orientation.x > 0) return 1;
-    else return -1;
+    if (old_event.orientation.x - event.orientation.x > 0) {
+      Serial.println("Moving right direction");
+      return 1;  // moving to the right
+    }
+    else {
+      Serial.println("Moving wrong direction");
+      return -1; // moving to the left
+    }
   }
-  else if (old_event.orientation.x - event.orientation.x < 0) return 1;
-  else return -1;
+  else if (old_event.orientation.x - event.orientation.x < 0) {
+    Serial.println("Moving right direction");
+    return 1; // moving to the right
+  }
+  else {
+    Serial.println("Moving wrong direction");
+    return -1; // moving to the left
+  }
 }
 
 // increase_motor_speed():
@@ -247,6 +273,51 @@ void stop_motion() {
   delay(100); // discharge all current through motors
 }
 
+
+// check_on_track():
+// Compares the current gyroscope's value to the target value.
+// If the gyroscope is moving in the wrong direction, then switch the motors.
+// When the target value is reached, stop the motors.
+
+void check_on_track (sensors_event_t event) { //, sensors_event_t target_event) {
+  Serial.println("check_on_track called");
+  switch (current_state) {
+    // Serial.println("current_state = ", current_state);
+    case HEEL_LIFT_STATE: // if we are in the heel lift state
+    Serial.print("check_on_track HEEL_LIFT_STATE");
+      target_theta_x_low = 358; target_theta_x_high = 360;
+      // target_theta_y_low = -77; target_theta_y_high = -75;
+      // target_theta_z_low = 77; target_theta_z_high = 79;
+      if (targeted_bounds_x(event)) { // We are within the target range
+        current_state = EXTENSION_FORWARD_STATE; // current state is now a different range
+        Serial.println("check_on_track EXTENSION_FORWARD_STATE");
+      }
+      else if (! targeted_bounds_x(event)) {  // check to see if it is moving the correct direction
+        if (direction_of_movement(event, old_event)) {    // Moving to the right.
+          break;
+        }
+        if (! direction_of_movement(event, old_event)) {
+          // Change the direction of the motor
+        }
+      }
+      // Also need to check if it is too far to the left or too far to the right of the target_theta_x. Do this when checking the direction_of_movement
+      break;
+  } 
+}
+
+/*
+// direction_of_movement():
+// This function takes the old event and compares it to the current event to dictate orientation 
+int direction_of_movement(sensors_event_t event, sensors_event_t old_event) {
+  if ((range(359,360, old_event.orientation.x)) || (range(0, 1, old_event.orientation.x))) { // if the range loops from 360 to 0 or 0 to 360 it's an odd case
+    if (old_event.orientation.x - event.orientation.x > 0) return 1;
+    else return -1;
+  }
+  else if (old_event.orientation.x - event.orientation.x < 0) return 1;
+  else return -1;
+}
+*/
+
 //====END OF HELPER FUNCTIONS==============================================
 
 //====SETUP===================================================
@@ -257,13 +328,14 @@ void setup() {
   AFMS.begin();  // create with the default frequency 1.6KHz
   //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
   
-  if(!lower_leg_tracker.begin())
-  {
+  if(!lower_leg_tracker.begin()) {
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!"); // There was a problem detecting the BNO055 ... check your connections
     while(1);
   }
   lower_leg_tracker.setExtCrystalUse(true);
   
+  current_state = EQUILIBRIUM_STATE; // Starting from equilibrium
+
   Serial.println("Setup complete.");
 }
 
@@ -279,57 +351,61 @@ void loop() {
 			case 's': //s for start
 				Serial.print("Starting leg motion.");
         current_state = HEEL_LIFT_STATE;
-				knee_flex(FORWARD, BACKWARD, 120);
-				break;
-			case 'x': // x for exit
-				Serial.println("Stopping all motion.");
-				stop_motion();
+        check_on_track(event);
+	// 			knee_flex(FORWARD, BACKWARD, 120);
+	// 			break;
+	// 		case 'x': // x for exit
+	// 			Serial.println("Stopping all motion.");
+	// 			stop_motion();
 				break;
 		}
-	}
+	// }
 
-  switch (current_state) {
-    case HEEL_LIFT_STATE:
-      if (point_reached(event)) {
-        stop_motion();
-        extend_forward(BACKWARD, FORWARD, 200);
-      }
-      break;
-    case EXTENSION_FORWARD_STATE:
-      if (point_reached(event)) {
-        stop_motion();
-        extend_forward(BACKWARD, FORWARD, 200);
-      }
-      break;
-    case EXTENSION_FORWARD_STATE_PART_2:
-      if (point_reached(event)) {
-        stop_motion();
-        follow_through(BACKWARD, FORWARD, 200);
-      }
-      break;
-    case FOLLOW_THROUGH_STATE:
-      if (point_reached(event)) {
-        stop_motion();
-        return_equilibrium(BACKWARD, FORWARD, 200);
-      }
-      break;
-    case RETURN_TO_EQUILIBRIUM_STATE:
-      if (point_reached(event)) {
-        stop_motion();
-      }
-      break;
+ //  switch (current_state) {
+ //    case HEEL_LIFT_STATE:
+ //      Serial.println("HEEL_LIFT_STATE");
+ //      if (point_reached(event)) {
+ //        stop_motion();
+ //        extend_forward(BACKWARD, FORWARD, 200);
+ //      }
+ //      break;
+ //    case EXTENSION_FORWARD_STATE:
+ //      Serial.println("EXTENSION_FORWARD_STATE");
+ //      if (point_reached(event)) {
+ //        stop_motion();
+ //        extend_forward_release(BACKWARD, FORWARD, 200);
+ //      }
+ //      break;
+ //    case EXTENSION_FORWARD_STATE_PART_2:
+ //      Serial.println("EXTENSION_FORWARD_STATE_PART_2");
+ //      if (point_reached(event)) {
+ //        stop_motion();
+ //        follow_through(BACKWARD, FORWARD, 200);
+ //      }
+ //      break;
+ //    case FOLLOW_THROUGH_STATE:
+ //      Serial.println("FOLLOW_THROUGH_STATE");
+ //      if (point_reached(event)) {
+ //        stop_motion();
+ //        return_equilibrium(BACKWARD, FORWARD, 200);
+ //      }
+ //      break;
+ //    case RETURN_TO_EQUILIBRIUM_STATE:
+ //      Serial.println("RETURN_TO_EQUILIBRIUM_STATE");
+ //      if (point_reached(event)) {
+ //        stop_motion();
+ //      }
+ //      break;
   }
 
   // Constantly print out the gyroscopic readings from the BNO055
-  // Serial.print(event.orientation.x, 4);
-  // Serial.print("\tY: ");
-  // Serial.print(event.orientation.y, 4);
-  // Serial.print("\tZ: ");
-  // Serial.println(event.orientation.z, 4); 
+  Serial.print("X: ");
+  Serial.print(event.orientation.x, 4);
+  Serial.print("\tY: ");
+  Serial.print(event.orientation.y, 4);
+  Serial.print("\tZ: ");
+  Serial.println(event.orientation.z, 4); 
+  delay(400);
   old_event = event;
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }
-
-
-
-

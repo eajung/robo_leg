@@ -83,16 +83,16 @@ bool targeted_bounds(sensors_event_t event) {
 bool point_reached(sensors_event_t event) {
   switch (current_state) {
     case HEEL_LIFT_STATE: // if we are in the heel lift state
-      target_theta_x_low = 358; target_theta_x_high = 360;
-      target_theta_y_low = -77; target_theta_y_high = -75;
-      target_theta_z_low = 77; target_theta_z_high = 79;
+      target_theta_x_low = 43.75; target_theta_x_high = 45;
+      target_theta_y_low = -39.75; target_theta_y_high = -37.75;
+      target_theta_z_low = 68.75; target_theta_z_high = 70;
       if (targeted_bounds(event)) {
         current_state = EXTENSION_FORWARD_STATE; // current state is now a different range
         return true;
       }
       break;
     case EXTENSION_FORWARD_STATE:
-      target_theta_x_low = 330.75; target_theta_x_high = 331.25;
+      target_theta_x_low = 30; target_theta_x_high = 32;
       target_theta_y_low = -78.1; target_theta_y_high = -77.75;
       target_theta_z_low = -77.8; target_theta_z_high = -77;
       if (targeted_bounds(event)) {
@@ -261,6 +261,7 @@ void setup() {
     Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!"); // There was a problem detecting the BNO055 ... check your connections
     while(1);
   }
+  
   lower_leg_tracker.setExtCrystalUse(true);
   
   current_state = EQUILIBRIUM_STATE; // Starting from equilibrium
@@ -286,6 +287,13 @@ void loop() {
 				Serial.println("Stopping all motion.");
 				stop_motion();
 				break;
+      case 'p':
+        Serial.print(event.orientation.x, 4);
+        Serial.print("\tY: ");
+        Serial.print(event.orientation.y, 4);
+        Serial.print("\tZ: ");
+        Serial.println(event.orientation.z, 4); 
+        break;
 		}
 	}
 
@@ -299,7 +307,7 @@ void loop() {
     case EXTENSION_FORWARD_STATE:
       if (point_reached(event)) {
         stop_motion();
-        extend_forward_release(BACKWARD, FORWARD, 200);
+        // extend_forward_release(BACKWARD, FORWARD, 200);
       }
       break;
     case EXTENSION_FORWARD_STATE_PART_2:
@@ -321,12 +329,12 @@ void loop() {
       break;
   }
 
-  // Constantly print out the gyroscopic readings from the BNO055
-  // Serial.print(event.orientation.x, 4);
-  // Serial.print("\tY: ");
-  // Serial.print(event.orientation.y, 4);
-  // Serial.print("\tZ: ");
-  // Serial.println(event.orientation.z, 4); 
+//   Constantly print out the gyroscopic readings from the BNO055
+//   Serial.print(event.orientation.x, 4);
+//   Serial.print("\tY: ");
+//   Serial.print(event.orientation.y, 4);
+//   Serial.print("\tZ: ");
+//   Serial.println(event.orientation.z, 4); 
   old_event = event;
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }

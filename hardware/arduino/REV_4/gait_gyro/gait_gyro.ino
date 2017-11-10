@@ -151,20 +151,20 @@ int direction_of_movement(sensors_event_t event, sensors_event_t old_event) {
   if ((range(359,360, old_event.orientation.x)) || (range(0, 1, old_event.orientation.x))) { // if the range loops from 360 to 0 or 0 to 360 it's an odd case
     if (old_event.orientation.x - event.orientation.x > 0) {
       Serial.println("Moving right direction");
-      return 1;  // moving to the right
+      return 1;  // moving to the right (bending leg)
     }
     else {
       Serial.println("Moving wrong direction");
-      return -1; // moving to the left
+      return -1; // moving to the left (straightening leg)
     }
   }
   else if (old_event.orientation.x - event.orientation.x < 0) {
     Serial.println("Moving right direction");
-    return 1; // moving to the right
+    return 1; // moving to the right (bending leg)
   }
   else {
     Serial.println("Moving wrong direction");
-    return -1; // moving to the left
+    return -1; // moving to the left (straightening leg)
   }
 }
 
@@ -279,31 +279,67 @@ void stop_motion() {
 // If the gyroscope is moving in the wrong direction, then switch the motors.
 // When the target value is reached, stop the motors.
 
-void check_on_track (sensors_event_t event) { //, sensors_event_t target_event) {
-  Serial.println("check_on_track called");
-  switch (current_state) {
-    // Serial.println("current_state = ", current_state);
-    case HEEL_LIFT_STATE: // if we are in the heel lift state
-    Serial.print("check_on_track HEEL_LIFT_STATE");
-      target_theta_x_low = 358; target_theta_x_high = 360;
-      // target_theta_y_low = -77; target_theta_y_high = -75;
-      // target_theta_z_low = 77; target_theta_z_high = 79;
-      if (targeted_bounds_x(event)) { // We are within the target range
-        current_state = EXTENSION_FORWARD_STATE; // current state is now a different range
-        Serial.println("check_on_track EXTENSION_FORWARD_STATE");
-      }
-      else if (! targeted_bounds_x(event)) {  // check to see if it is moving the correct direction
-        if (direction_of_movement(event, old_event)) {    // Moving to the right.
-          break;
-        }
-        if (! direction_of_movement(event, old_event)) {
-          // Change the direction of the motor
-        }
-      }
-      // Also need to check if it is too far to the left or too far to the right of the target_theta_x. Do this when checking the direction_of_movement
-      break;
-  } 
+// void check_on_track (sensors_event_t event) { //, sensors_event_t target_event) {
+//   Serial.println("check_on_track called");
+//   switch (current_state) {
+//     // Serial.println("current_state = ", current_state);
+//     case HEEL_LIFT_STATE: // if we are in the heel lift state
+//       Serial.print("check_on_track HEEL_LIFT_STATE");
+//       target_theta_x_low = 358; target_theta_x_high = 360;
+//       // target_theta_y_low = -77; target_theta_y_high = -75;
+//       // target_theta_z_low = 77; target_theta_z_high = 79;
+//       if (targeted_bounds_x(event)) { // We are within the target range
+//         current_state = EXTENSION_FORWARD_STATE; // current state is now a different range
+//         Serial.println("check_on_track EXTENSION_FORWARD_STATE");
+//       }
+//       else if (! targeted_bounds_x(event)) {  // check to see if it is moving the correct direction
+//         if (direction_of_movement(event, old_event)) {    // Moving to the right.
+//           break;
+//         }
+//         if (! direction_of_movement(event, old_event)) {
+//           // Change the direction of the motor
+//         }
+//       }
+//       // Also need to check if it is too far to the left or too far to the right of the target_theta_x. Do this when checking the direction_of_movement
+//       break;
+//   } 
+// }
+
+
+// on_track_heel_lift_state():
+// Compares the current gyroscope's value to the target value.
+// If the gyroscope is moving in the wrong direction, then switch the motors.
+// When the target value is reached, stop the motors.
+void on_track_heel_lift_state(sensors_event_t event){
+  Serial.println("Check on track called.");
+  // hamstring_motor->run(motor_direction_f);
+  //     for (i = 0; i < motor_speed; i++) {
+  //       hamstring_motor->setSpeed(i * .80);
+  //       delay(5);
+  //     }
+  // First check to see if we are within the target range.
+  if (targeted_bounds_x(event)) {
+    Serial.println("Reached the target area. Stop motor");
+    stop_motion();
+  }
+
+  // If going the wrong direction, stop motors and switch direction
+  else if (direction_of_movement(event, old_event) == -1) {
+  // else if (event.orientation.x < old_event.orientation.x) { 
+    stop_motion();
+    knee_flex(BACKWARD, FORWARD, 120);
+  }
+
+  // If moving the correct direction, do nothing and continue moving.
+  // else if (event.orientation.x > old_event.orientation.x) {
+  //   // gyroscope moving counterclockwise/right direction. The heel is moving up
+  //   continue; // or should I use break;?
+  // }
+  else if (direction_of_movement(event, old_event) == 1) {
+    continue;
+  }
 }
+
 
 /*
 // direction_of_movement():

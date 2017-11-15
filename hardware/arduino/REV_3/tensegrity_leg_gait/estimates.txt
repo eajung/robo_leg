@@ -8,7 +8,7 @@ END OF STAGE 4			| X: 37.6875		Y: -37.0625		Z: 90.5000
 Case where in between: 
 * Old = 5 new = 45 (+)
 * Old = 45 new 5 (-)
-* Old = 360 new = 0.6 (+)
+* Old = 360 new = 0.6 (+)7
 * Old = 0.6 new 360 (-)
 * Old = 340 new = 355 (-)
 * Old = 355 new = 340 (+)

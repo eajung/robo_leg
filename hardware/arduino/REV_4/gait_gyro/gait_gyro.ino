@@ -310,33 +310,37 @@ void stop_motion() {
 // Compares the current gyroscope's value to the target value.
 // If the gyroscope is moving in the wrong direction, then switch the motors.
 // When the target value is reached, stop the motors.
-void on_track_heel_lift_state(sensors_event_t event){
+void on_track_heel_lift_state(sensors_event_t event) {
   Serial.println("Check on track called.");
-  // hamstring_motor->run(motor_direction_f);
-  //     for (i = 0; i < motor_speed; i++) {
-  //       hamstring_motor->setSpeed(i * .80);
-  //       delay(5);
-  //     }
+
   // First check to see if we are within the target range.
   if (targeted_bounds_x(event)) {
-    Serial.println("Reached the target area. Stop motor");
+    Serial.println("Reached the target area. Stop motor.");
     stop_motion();
   }
 
+  // If going the wrong direction, but towards the target value
+  else if ((direction_of_movement(event, old_event) == -1) & (event.orientation.x > target_theta_x_high)) {
+    Serial.println("Going towards target, but going the wrong way");
+    // continue;
+  }
   // If going the wrong direction, stop motors and switch direction
   else if (direction_of_movement(event, old_event) == -1) {
-  // else if (event.orientation.x < old_event.orientation.x) { 
     stop_motion();
     knee_flex(BACKWARD, FORWARD, 120);
+    Serial.println("Switching directions.");
+  }
+
+  // Checks to see if I went past my target value by mistake
+  else if ((event.orientation.x > target_theta_x_high) & (direction_of_movement(event, old_event) == 1)) {
+    stop_motion();
+    knee_flex(FORWARD, BACKWARD, 120);
   }
 
   // If moving the correct direction, do nothing and continue moving.
-  // else if (event.orientation.x > old_event.orientation.x) {
-  //   // gyroscope moving counterclockwise/right direction. The heel is moving up
-  //   continue; // or should I use break;?
-  // }
   else if (direction_of_movement(event, old_event) == 1) {
-    continue;
+    Serial.println("Keep moving.");
+    // continue;
   }
 }
 
@@ -386,14 +390,15 @@ void loop() {
     command = input[0];
 		switch (command) {
 			case 's': //s for start
-				Serial.print("Starting leg motion.");
-        current_state = HEEL_LIFT_STATE;
-        check_on_track(event);
-	// 			knee_flex(FORWARD, BACKWARD, 120);
-	// 			break;
-	// 		case 'x': // x for exit
-	// 			Serial.println("Stopping all motion.");
-	// 			stop_motion();
+				Serial.println("Starting leg motion.");
+        on_track_heel_lift_state(event);
+    //     current_state = HEEL_LIFT_STATE;
+    //     // check_on_track(event);
+				// knee_flex(FORWARD, BACKWARD, 120);
+				break;
+			case 'x': // x for exit
+				Serial.println("Stopping all motion.");
+				stop_motion();
 				break;
       case 'p':
         Serial.print(event.orientation.x, 4);
@@ -403,6 +408,46 @@ void loop() {
         Serial.println(event.orientation.z, 4); 
         break;
 		}
+  }
+  
+  switch (current_state) {
+    case HEEL_LIFT_STATE:
+      Serial.println("HEEL_LIFT_STATE");
+      on_track_heel_lift_state(event);
+      // if (point_reached(event)) {
+      //   stop_motion();
+      //   extend_forward(BACKWARD, FORWARD, 200);
+      // }
+      break;
+    case EXTENSION_FORWARD_STATE:
+      Serial.println("EXTENSION_FORWARD_STATE");
+      if (point_reached(event)) {
+        stop_motion();
+        extend_forward_release(BACKWARD, FORWARD, 200);
+      }
+      break;
+    case EXTENSION_FORWARD_STATE_PART_2:
+      Serial.println("EXTENSION_FORWARD_STATE_PART_2");
+      if (point_reached(event)) {
+        stop_motion();
+        follow_through(BACKWARD, FORWARD, 200);
+      }
+      break;
+    case FOLLOW_THROUGH_STATE:
+      Serial.println("FOLLOW_THROUGH_STATE");
+      if (point_reached(event)) {
+        stop_motion();
+        return_equilibrium(BACKWARD, FORWARD, 200);
+      }
+      break;
+    case RETURN_TO_EQUILIBRIUM_STATE:
+      Serial.println("RETURN_TO_EQUILIBRIUM_STATE");
+      if (point_reached(event)) {
+        stop_motion();
+      }
+      break;
+  }
+  }
 
   old_event = event;
   delay(BNO055_SAMPLERATE_DELAY_MS);

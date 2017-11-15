@@ -409,7 +409,7 @@ void loop() {
         break;
 		}
   }
-  
+
   switch (current_state) {
     case HEEL_LIFT_STATE:
       Serial.println("HEEL_LIFT_STATE");
@@ -446,7 +446,6 @@ void loop() {
         stop_motion();
       }
       break;
-  }
   }
 
   old_event = event;

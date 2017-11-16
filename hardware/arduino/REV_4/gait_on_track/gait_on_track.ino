@@ -1,6 +1,7 @@
 /*
-* File name: gait_gyro.ino
-* Author: Erik Jung
+* File name: gait_on_track.ino
+* Author: Erik Jung and Chris Cheney
+* Date: November 16, 2017
 * Comments: This code will provide the basis for a closed-loop feedback system
 * where the gyroscope acts as a sensor for positional feedback. Active tensile 
 * components will adjust to achieve specific angles.
@@ -229,12 +230,8 @@ void decrease_motor_speed(int motor_number, uint8_t motor_direction) {
 // Takes the specified active tensile element and decreases the current applied slowly to an eventual halt. 
 void decrease_hamstring_motor_speed(int motor_number, uint8_t motor_direction) { 
   Serial.println("decrease_hamstring_motor_speed");
-  // iliopsoas_motor->run(motor_direction);
-  // gluteus_motor->run(motor_direction);
   hamstring_motor->run(motor_direction);
   for(i = 10; i != 0; i--) { // slowly discharge motors to stop
-    // iliopsoas_motor->setSpeed(i);
-    // gluteus_motor->setSpeed(i);
     hamstring_motor->setSpeed(i);      
     delay(5);
   }
@@ -289,110 +286,56 @@ void stop_motion() {
 }
 
 
-// check_on_track():
-// Compares the current gyroscope's value to the target value.
-// If the gyroscope is moving in the wrong direction, then switch the motors.
-// When the target value is reached, stop the motors.
-
-// void check_on_track (sensors_event_t event) { //, sensors_event_t target_event) {
-//   Serial.println("check_on_track called");
-//   switch (current_state) {
-//     // Serial.println("current_state = ", current_state);
-//     case HEEL_LIFT_STATE: // if we are in the heel lift state
-//       Serial.print("check_on_track HEEL_LIFT_STATE");
-//       target_theta_x_low = 358; target_theta_x_high = 360;
-//       // target_theta_y_low = -77; target_theta_y_high = -75;
-//       // target_theta_z_low = 77; target_theta_z_high = 79;
-//       if (targeted_bounds_x(event)) { // We are within the target range
-//         current_state = EXTENSION_FORWARD_STATE; // current state is now a different range
-//         Serial.println("check_on_track EXTENSION_FORWARD_STATE");
-//       }
-//       else if (! targeted_bounds_x(event)) {  // check to see if it is moving the correct direction
-//         if (direction_of_movement(event, old_event)) {    // Moving to the right.
-//           break;
-//         }
-//         if (! direction_of_movement(event, old_event)) {
-//           // Change the direction of the motor
-//         }
-//       }
-//       // Also need to check if it is too far to the left or too far to the right of the target_theta_x. Do this when checking the direction_of_movement
-//       break;
-//   } 
-// }
-
-
-// on_track_heel_lift_state():
-// Compares the current gyroscope's value to the target value.
-// If the gyroscope is moving in the wrong direction, then switch the motors.
-// When the target value is reached, stop the motors.
+/* 
+  on_track_heel_lift_state():
+  Compares the current gyroscope's value to the target value.
+  If the gyroscope is moving in the wrong direction, then switch the motors.
+  When the target value is reached, stop the motors. 
+*/
 void on_track_heel_lift_state(sensors_event_t event) {
   Serial.println("Check on track called.");
+  Serial.println("direction_of_movement = ");
+  Serial.print(direction_of_movement(event, old_event));
 
-  Serial.println(direction_of_movement(event, old_event));
-
+  // If we are approaching the target value, then begin slowing down the motors.
   if (range(42.5, 43.75, event.orientation.x)) {
     decrease_hamstring_motor_speed(HAMSTRING_MOTOR_NUMBER, BACKWARD);
   }
+
   // First check to see if we are within the target range.
-  // if (targeted_bounds_x(event)) {
-  // if (range(target_theta_x_low, target_theta_x_high, event.orientation.x)){
-  else if (range(43.75, 45, event.orientation.x)){
+  else if (range(43.75, 45, event.orientation.x)) {   // target_theta_x_low = 43.75 and target_theta_x_high = 45.
     Serial.println("Reached the target area. Stop motor.");
-    // decrease_hamstring_motor_speed(HAMSTRING_MOTOR_NUMBER, BACKWARD);
     stop_motion();
   }
 
-  // else if ((direction_of_movement(event, old_event) == -1) && ((range(350,360, old_event.orientation.x)) || (range(0, 1, old_event.orientation.x)))) {
-  else if (range(345, 360, old_event.orientation.x)) {
-   // && (event.orientation.x > 330) && (old_event.orientation.x >= event.orientation.x)) {  //target_theta_x_high = 45
+  // Checks to see if the gyroscope "looped" from 0 to 360. Switch directions if it did.
+  else if (range(345, 360, old_event.orientation.x)) {  // A 15 degree (about) range is needed so the gyroscope has the ability to stabilize
     Serial.println("Looping the wrong way 0->360");
     knee_flex(FORWARD, BACKWARD, 120);
   }
 
-  // If going the wrong direction, but towards the target value
-  // else if ((direction_of_movement(event, old_event) == -1) && (event.orientation.x > target_theta_x_high)) {
-  else if ((direction_of_movement(event, old_event) == -1) && (event.orientation.x > 45) && (old_event.orientation.x >= event.orientation.x)) {  //target_theta_x_high = 45
+  // If going the wrong direction, but towards the target value.
+  else if ((direction_of_movement(event, old_event) == -1) && (event.orientation.x > 45)) {  //target_theta_x_high = 45
     Serial.println("Going towards target, but going the wrong way");
-    // continue;
   }
 
   // If going the wrong direction, stop motors and switch direction
-  else if (direction_of_movement(event, old_event) == -1) { // && (old_event.orientation.x > event.orientation.x)) {
-  //   // stop_motion();
+  else if (direction_of_movement(event, old_event) == -1) {
     Serial.println("Switching directions.");
-    // knee_flex(BACKWARD, FORWARD, 120);
     knee_flex(FORWARD, BACKWARD, 120);
   }
 
   // Checks to see if I went past my target value by mistake
-  // else if ((event.orientation.x > target_theta_x_high) & (direction_of_movement(event, old_event) == 1)) {
-  else if ((event.orientation.x > (45 + 3)) && (direction_of_movement(event, old_event) == 1)) { //target_theta_x_high = 45, Adding 2 makes a buffer so the leg can reach equilibrium
+  else if ((event.orientation.x > (45 + 3)) && (direction_of_movement(event, old_event) == 1)) { //target_theta_x_high = 45, Adding 3 makes a buffer so the leg can reach equilibrium
     Serial.println("Went too far, switch directions.");
-    // stop_motion();
     knee_flex(BACKWARD, FORWARD, 120);
-    // knee_flex(BACKWARD, FORWARD, 120);
   }
 
-  // // If moving the correct direction, do nothing and continue moving.
+  // If moving the correct direction, do nothing and continue moving.
   else if (direction_of_movement(event, old_event) == 1) {
     Serial.println("Keep moving.");
-    // continue;
   }
 }
-
-
-/*
-// direction_of_movement():
-// This function takes the old event and compares it to the current event to dictate orientation 
-int direction_of_movement(sensors_event_t event, sensors_event_t old_event) {
-  if ((range(359,360, old_event.orientation.x)) || (range(0, 1, old_event.orientation.x))) { // if the range loops from 360 to 0 or 0 to 360 it's an odd case
-    if (old_event.orientation.x - event.orientation.x > 0) return 1;
-    else return -1;
-  }
-  else if (old_event.orientation.x - event.orientation.x < 0) return 1;
-  else return -1;
-}
-*/
 
 //====END OF HELPER FUNCTIONS==============================================
 
@@ -427,10 +370,8 @@ void loop() {
 		switch (command) {
 			case 's': //s for start
 				Serial.println("Starting leg motion.");
-        // on_track_heel_lift_state(event);
-    //     current_state = HEEL_LIFT_STATE;
-    //     // check_on_track(event);
-				// knee_flex(FORWARD, BACKWARD, 120);
+        // current_state = HEEL_LIFT_STATE;
+        // knee_flex(FORWARD, BACKWARD, 120);
         // delay(1000);
 // <<<<<<< Updated upstream
 // =======
@@ -500,44 +441,6 @@ void loop() {
   //     }
   //     break;
   // }
-  // }
-
-  // switch (current_state) {
-  //   case HEEL_LIFT_STATE:
-  //     Serial.println("HEEL_LIFT_STATE");
-  //     on_track_heel_lift_state(event);
-  //     // if (point_reached(event)) {
-  //     //   stop_motion();
-  //     //   extend_forward(BACKWARD, FORWARD, 200);
-  //     // }
-  //     break;
-  //   case EXTENSION_FORWARD_STATE:
-  //     Serial.println("EXTENSION_FORWARD_STATE");
-  //     if (point_reached(event)) {
-  //       stop_motion();
-  //       extend_forward_release(BACKWARD, FORWARD, 200);
-  //     }
-  //     break;
-  //   case EXTENSION_FORWARD_STATE_PART_2:
-  //     Serial.println("EXTENSION_FORWARD_STATE_PART_2");
-  //     if (point_reached(event)) {
-  //       stop_motion();
-  //       follow_through(BACKWARD, FORWARD, 200);
-  //     }
-  //     break;
-  //   case FOLLOW_THROUGH_STATE:
-  //     Serial.println("FOLLOW_THROUGH_STATE");
-  //     if (point_reached(event)) {
-  //       stop_motion();
-  //       return_equilibrium(BACKWARD, FORWARD, 200);
-  //     }
-  //     break;
-  //   case RETURN_TO_EQUILIBRIUM_STATE:
-  //     Serial.println("RETURN_TO_EQUILIBRIUM_STATE");
-  //     if (point_reached(event)) {
-  //       stop_motion();
-  //     }
-  //     break;
   // }
 
   old_event = event;

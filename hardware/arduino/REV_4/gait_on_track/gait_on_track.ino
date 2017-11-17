@@ -38,7 +38,9 @@
 #define BNO055_SAMPLERATE_DELAY_MS 10 // Set the delay between fresh samples
 sensors_event_t old_event;
 int i, current_state, theta_direction;
-float target_theta_x_low = 43.75, target_theta_y_low = 45, target_theta_z_low, target_theta_x_high, target_theta_y_high, target_theta_z_high;  
+float target_theta_x_low = 43.75;
+float target_theta_x_high = 45;
+float target_theta_y_low, target_theta_z_low, target_theta_y_high, target_theta_z_high;  
 String input; // keyboard input
 char command; // hotkey parsed from input
 //-----------------------------------------------------
@@ -133,10 +135,10 @@ bool point_reached(sensors_event_t event) {
       }
       break;
     case RETURN_TO_EQUILIBRIUM_STATE:
-      target_theta_x_low = 36; target_theta_x_high = 38;
+      target_theta_x_low = 0; target_theta_x_high = 1.5;
       target_theta_y_low = -38; target_theta_y_high = -36;
       target_theta_z_low = 89; target_theta_z_high = 91;
-      if (targeted_bounds(event)) {
+      if (targeted_bounds_x(event)) {
         current_state = EQUILIBRIUM_STATE; // current state is now a different range
         Serial.println("EQUILIBRIUM_STATE");
         return true;
@@ -149,7 +151,8 @@ bool point_reached(sensors_event_t event) {
 // direction_of_movement():
 // This function takes the old event and compares it to the current event to dictate orientation 
 int direction_of_movement(sensors_event_t event, sensors_event_t old_event) {
-  if ((range(359,360, old_event.orientation.x)) || (range(0, 1, old_event.orientation.x))) { // if the range loops from 360 to 0 or 0 to 360 it's an odd case
+  // if ((range(359,360, old_event.orientation.x)) || (range(0, 1, old_event.orientation.x))) { // if the range loops from 360 to 0 or 0 to 360 it's an odd case
+  if ((old_event.orientation.x >= 359.5) || (old_event.orientation.x <= 0.5)) {  
     if (old_event.orientation.x - event.orientation.x > 0) {
       // Serial.println("Moving right direction");
       return 1;  // moving to the right (bending leg)
@@ -159,7 +162,7 @@ int direction_of_movement(sensors_event_t event, sensors_event_t old_event) {
       return -1; // moving to the left (straightening leg)
     }
   }
-  else if (old_event.orientation.x - event.orientation.x < 0) {
+  else if (old_event.orientation.x - event.orientation.x < 2) {
     // Serial.println("Moving right direction");
     return 1; // moving to the right (bending leg)
   }
@@ -293,17 +296,17 @@ void stop_motion() {
   When the target value is reached, stop the motors. 
 */
 void on_track_heel_lift_state(sensors_event_t event) {
-  Serial.println("Check on track called.");
-  Serial.println("direction_of_movement = ");
-  Serial.print(direction_of_movement(event, old_event));
+  // Serial.println("Check on track called.");
+  Serial.print("direction_of_movement = ");
+  Serial.println(direction_of_movement(event, old_event));
 
   // If we are approaching the target value, then begin slowing down the motors.
-  if (range(42.5, 43.75, event.orientation.x)) {
+  if (range((target_theta_x_low - 1), target_theta_x_low, event.orientation.x)) {
     decrease_hamstring_motor_speed(HAMSTRING_MOTOR_NUMBER, BACKWARD);
   }
 
   // First check to see if we are within the target range.
-  else if (range(43.75, 45, event.orientation.x)) {   // target_theta_x_low = 43.75 and target_theta_x_high = 45.
+  else if (targeted_bounds_x(event)){
     Serial.println("Reached the target area. Stop motor.");
     stop_motion();
   }
@@ -315,7 +318,7 @@ void on_track_heel_lift_state(sensors_event_t event) {
   }
 
   // If going the wrong direction, but towards the target value.
-  else if ((direction_of_movement(event, old_event) == -1) && (event.orientation.x > 45)) {  //target_theta_x_high = 45
+  else if ((direction_of_movement(event, old_event) == -1) && (event.orientation.x > target_theta_x_high)) {
     Serial.println("Going towards target, but going the wrong way");
   }
 
@@ -326,7 +329,7 @@ void on_track_heel_lift_state(sensors_event_t event) {
   }
 
   // Checks to see if I went past my target value by mistake
-  else if ((event.orientation.x > (45 + 3)) && (direction_of_movement(event, old_event) == 1)) { //target_theta_x_high = 45, Adding 3 makes a buffer so the leg can reach equilibrium
+  else if ((event.orientation.x > (target_theta_x_high + 3)) && (direction_of_movement(event, old_event) == 1)) { // Adding 3 makes a buffer so the leg can reach equilibrium
     Serial.println("Went too far, switch directions.");
     knee_flex(BACKWARD, FORWARD, 120);
   }
@@ -367,35 +370,25 @@ void loop() {
 	if (Serial.available() > 0) { // if serial input is ready to read input
 		input = Serial.readString();
     command = input[0];
+    
 		switch (command) {
 			case 's': //s for start
-				Serial.println("Starting leg motion.");
-        // current_state = HEEL_LIFT_STATE;
-        // knee_flex(FORWARD, BACKWARD, 120);
-        // delay(1000);
-// <<<<<<< Updated upstream
-// =======
+        Serial.println("Starting leg motion.");
+        // on_track_heel_lift_state(event);
+        // command = 's';
+        current_state = HEEL_LIFT_STATE;
 				break;
+      case 'r': // r for return
+        Serial.println("Returning to equilibrium");
+        knee_flex(BACKWARD, FORWARD, 120);
+        current_state = RETURN_TO_EQUILIBRIUM_STATE;
 			case 'x': // x for exit
 				Serial.println("Stopping all motion.");
 				stop_motion();
-// >>>>>>> Stashed changes
-				break;
-// 			case 'x': // x for exit
-// 				Serial.println("Stopping all motion.");
-// 				stop_motion();
-// 				break;
-      // case 'p':
-      //   Serial.println("X: ");
-      //   Serial.print(event.orientation.x, 4);
-      //   Serial.print("\tY: ");
-      //   Serial.print(event.orientation.y, 4);
-      //   Serial.print("\tZ: ");
-      //   Serial.println(event.orientation.z, 4); 
-      //   break;
+        break;
 		}
   }
-      on_track_heel_lift_state(event);
+      // on_track_heel_lift_state(event);
       Serial.print("X: ");
       Serial.print(event.orientation.x, 4);
       Serial.print("\tY: ");
@@ -404,44 +397,55 @@ void loop() {
       Serial.println(event.orientation.z, 4);
       Serial.println(" ");
 
-  // switch (current_state) {
-  //   case HEEL_LIFT_STATE:
-  //     Serial.println("HEEL_LIFT_STATE");
-  //     on_track_heel_lift_state(event);
-  //     // if (point_reached(event)) {
-  //     //   stop_motion();
-  //     //   extend_forward(BACKWARD, FORWARD, 200);
-  //     // }
-  //     break;
-  //   case EXTENSION_FORWARD_STATE:
-  //     Serial.println("EXTENSION_FORWARD_STATE");
-  //     if (point_reached(event)) {
-  //       stop_motion();
-  //       extend_forward_release(BACKWARD, FORWARD, 200);
-  //     }
-  //     break;
-  //   case EXTENSION_FORWARD_STATE_PART_2:
-  //     Serial.println("EXTENSION_FORWARD_STATE_PART_2");
-  //     if (point_reached(event)) {
-  //       stop_motion();
-  //       follow_through(BACKWARD, FORWARD, 200);
-  //     }
-  //     break;
-  //   case FOLLOW_THROUGH_STATE:
-  //     Serial.println("FOLLOW_THROUGH_STATE");
-  //     if (point_reached(event)) {
-  //       stop_motion();
-  //       return_equilibrium(BACKWARD, FORWARD, 200);
-  //     }
-  //     break;
-  //   case RETURN_TO_EQUILIBRIUM_STATE:
-  //     Serial.println("RETURN_TO_EQUILIBRIUM_STATE");
-  //     if (point_reached(event)) {
-  //       stop_motion();
-  //     }
-  //     break;
-  // }
-  // }
+  switch (current_state) {
+    case HEEL_LIFT_STATE:
+      Serial.println("HEEL_LIFT_STATE");
+      on_track_heel_lift_state(event);
+      // if (point_reached(event)) {
+      //   stop_motion();
+      //   extend_forward(BACKWARD, FORWARD, 200);
+      // }
+      break;
+    // case EXTENSION_FORWARD_STATE:
+    //   Serial.println("EXTENSION_FORWARD_STATE");
+    //   if (point_reached(event)) {
+    //     stop_motion();
+    //     extend_forward_release(BACKWARD, FORWARD, 200);
+    //   }
+    //   break;
+    // case EXTENSION_FORWARD_STATE_PART_2:
+    //   Serial.println("EXTENSION_FORWARD_STATE_PART_2");
+    //   if (point_reached(event)) {
+    //     stop_motion();
+    //     follow_through(BACKWARD, FORWARD, 200);
+    //   }
+    //   break;
+    // case FOLLOW_THROUGH_STATE:
+    //   Serial.println("FOLLOW_THROUGH_STATE");
+    //   if (point_reached(event)) {
+    //     stop_motion();
+    //     return_equilibrium(BACKWARD, FORWARD, 200);
+    //   }
+    //   break;
+    case RETURN_TO_EQUILIBRIUM_STATE:
+      Serial.println("RETURN_TO_EQUILIBRIUM_STATE");
+      Serial.print("direction_of_movement = ");
+      Serial.println(direction_of_movement(event, old_event));
+      if (point_reached(event)) {
+        stop_motion();
+        current_state = EQUILIBRIUM_STATE;
+      }
+      else if (direction_of_movement(event, old_event) == -1) {
+          Serial.println("Keep moving to equilibrium");
+      }
+      else {
+        knee_flex(BACKWARD, FORWARD, 120);
+      }
+      break; 
+    case EQUILIBRIUM_STATE:
+      Serial.println("Reached equilibrium state");
+      break;
+  }
 
   old_event = event;
   delay(BNO055_SAMPLERATE_DELAY_MS);

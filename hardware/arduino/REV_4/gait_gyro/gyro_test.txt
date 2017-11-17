@@ -1,4 +1,6 @@
+<<<<<<< HEAD
 // Rough estimates from current leg gait program
+// Stage 2 needs to be remeasured
 END OF STAGE 1		 		| X: 44.5000		Y: -38.1250		Z: 90.6875
 END OF STAGE 2				| X: 31.7500		Y: -43.9375		Z: 82.3750
 END OF STAGE 2 PART 2	| X: 31.7500		Y: -43.9375		Z: 82.3750

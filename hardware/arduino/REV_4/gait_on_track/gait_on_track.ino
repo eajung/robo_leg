@@ -382,6 +382,7 @@ void loop() {
         Serial.println("Returning to equilibrium");
         knee_flex(BACKWARD, FORWARD, 120);
         current_state = RETURN_TO_EQUILIBRIUM_STATE;
+        break;
 			case 'x': // x for exit
 				Serial.println("Stopping all motion.");
 				stop_motion();

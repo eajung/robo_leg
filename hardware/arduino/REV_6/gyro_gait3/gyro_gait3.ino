@@ -80,6 +80,10 @@ bool targeted_bounds(sensors_event_t event) {
 // point_reached():
 // By taking the readings from the gyroscope and the given current_state of our system, we return 
 // true if the orientation of the gyroscope has reached the specified angles. 
+
+//11/21/2017 jsut need to change target x-values now
+
+
 bool point_reached(sensors_event_t event) {
   switch (current_state) {
     case HEEL_LIFT_STATE: // if we are in the heel lift state
@@ -307,9 +311,10 @@ void loop() {
     case HEEL_LIFT_STATE:
       knee_flex(FORWARD, BACKWARD, 120);   //<---------------1
       if (point_reached(event)) {
+        stop_motion();
         Serial.print("Current state is: ");
-        Serial.println(current_state); 
-        stop_motion();//<------ Ask about this
+        Serial.println(current_state); //Should be second state (2)
+        Serial.println("should be 3rd now");
        //<---------------2
         //extend_forward(BACKWARD, FORWARD, 200); // REMOVE this this is just to put leg back.//<------ Ask about this
         //since youre going to exntend past the neutral point.
@@ -318,21 +323,20 @@ void loop() {
     case EXTENSION_FORWARD_STATE:
       extend_forward_release(BACKWARD, FORWARD, 200); // <----- You don't need both just the top one.!!!!!!
       if (point_reached(event)) {
+        stop_motion();// <-------Maybe stop motion quick, it might be too slow, then jump to next one
         Serial.print("Current state is: ");
         Serial.println(current_state); 
-        stop_motion();// <-------Maybe stop motion quick, it might be too slow, then jump to next one
-//        extend_forward_release(BACKWARD, FORWARD, 200); // <----- You don't need both just the top one.!!!!!!
-        Serial.println("2 stage is reached");//<---------------probably removing ^^^^
-      }
+        Serial.println("should be 3rd now");//<---------------probably removing ^^^^
+      }  
       break;
 
     case EXTENSION_FORWARD_STATE_PART_2:
       follow_through(BACKWARD, FORWARD, 200); ///<----------3
       if (point_reached(event)) {
+        stop_motion();
         Serial.print("Current state is: ");
         Serial.println(current_state); 
-        stop_motion();
-        //follow_through(BACKWARD, FORWARD, 200); ///<----------3
+        Serial.println("should be 4th now"); 
       }
       break;
   }// end of switch
@@ -340,17 +344,21 @@ void loop() {
 //    case FOLLOW_THROUGH_STATE:
      // return_equilibrium(BACKWARD, FORWARD, 200); //<----------------4
 //      if (point_reached(event)) {
+        // stop_motion();
           //Serial.print("Current state is: ");
           //Serial.println(current_state); 
-//        stop_motion();
+          //Serial.println("should be 5th now");
+//        
 //        
 //      }
 //      break;
 //    case RETURN_TO_EQUILIBRIUM_STATE:  MIGHT NOT NEED THIS AT all, consider removing
+      //knee_flex(BACKWARD, FORWARD, 100);   //<---------------5
 //      if (point_reached(event)) { //<--------------JUST FOR STOPPING
+            //stop_motion();
         //Serial.print("Current state is: ");
         //Serial.println(current_state); 
-//        stop_motion();
+//        
 //      }
 //      break;
 //  }

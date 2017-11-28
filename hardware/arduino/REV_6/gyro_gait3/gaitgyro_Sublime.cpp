@@ -72,16 +72,18 @@ bool range(float min,float max,float i) {
 // targeted_bounds():
 // Returns true if the gyroscope is within the designated bounds set for the next stage
 bool targeted_bounds(sensors_event_t event) {
-  return ((range(target_theta_x_low, target_theta_x_high, event.orientation.x)));
-}  
-//&& 
+  return ((range(target_theta_x_low, target_theta_x_high, event.orientation.x)));// && 
 //          (range(target_theta_y_low, target_theta_x_high, event.orientation.y)) && 
 //          (range(target_theta_z_low, target_theta_z_high, event.orientation.z)));
-
+}
 
 // point_reached():
 // By taking the readings from the gyroscope and the given current_state of our system, we return 
 // true if the orientation of the gyroscope has reached the specified angles. 
+
+//11/21/2017 jsut need to change target x-values now
+
+
 bool point_reached(sensors_event_t event) {
   switch (current_state) {
     case HEEL_LIFT_STATE: // if we are in the heel lift state
@@ -94,7 +96,7 @@ bool point_reached(sensors_event_t event) {
       }
       break;
     case EXTENSION_FORWARD_STATE:
-      target_theta_x_low = 17; target_theta_x_high = 19;
+      target_theta_x_low = 15; target_theta_x_high = 17; // orginall 30/32
 //      target_theta_y_low = -78.1; target_theta_y_high = -77.75;
 //      target_theta_z_low = -77.8; target_theta_z_high = -77;
       if (targeted_bounds(event)) {
@@ -103,9 +105,7 @@ bool point_reached(sensors_event_t event) {
       }
       break;
     case EXTENSION_FORWARD_STATE_PART_2:
-    //The range of values for this case are broader because the gyro jumps values too quickly
-    // so the motors don't stop when they should (missed)
-      target_theta_x_low = 330.35; target_theta_x_high = 340.75;
+      target_theta_x_low = 350.35; target_theta_x_high = 350.75;
 //      target_theta_y_low = -78.75; target_theta_y_high = -78.2;
 //      target_theta_z_low = -75.75; target_theta_z_high = -75.25;
       if (targeted_bounds(event)) {
@@ -123,7 +123,7 @@ bool point_reached(sensors_event_t event) {
       }
       break;
     case RETURN_TO_EQUILIBRIUM_STATE:
-      target_theta_x_low = 0; target_theta_x_high = 2;
+      target_theta_x_low = 36; target_theta_x_high = 38;
 //      target_theta_y_low = -38; target_theta_y_high = -36;
 //      target_theta_z_low = 89; target_theta_z_high = 91;
       if (targeted_bounds(event)) {
@@ -151,18 +151,19 @@ int direction_of_movement(sensors_event_t event, sensors_event_t old_event) {
 void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
                           uint8_t motor_direction_b, int motor_speed) {
   switch(motor_number) { // Specifies which motor we are actuating
+    //FRONT
     case ILIOPSOAS_MOTOR_NUMBER:
       iliopsoas_motor->run(motor_direction_f); //FORWARD, then backward 
       gluteus_motor->run(motor_direction_b);//BACKWARD, then forward
       hamstring_motor->run(motor_direction_f); // mimic the back to slowly release hamstring
       for (i = 0; i < motor_speed; i++) {
         iliopsoas_motor->setSpeed(i * 1.2); //front hip motor pulls forward. 
-        gluteus_motor->setSpeed(i * .20); //rear hip motor releases simultaneously with front x2 to increase speed
-        hamstring_motor->setSpeed(i * .65); //run to is slowly enxtend knee forward will flexing hip
+        gluteus_motor->setSpeed(i * .30); //rear hip motor releases simultaneously with front x2 to increase speed
+        hamstring_motor->setSpeed(i * .70); //run to is slowly enxtend knee forward will flexing hip
         delay(5);
       }
       break;   
-    
+    //REAR
     case GLUTE_MOTOR_NUMBER:
       gluteus_motor->run(motor_direction_b);
       iliopsoas_motor->run(motor_direction_f); //slowly run hip motor to lightly tight cable
@@ -174,12 +175,12 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
         delay(5);
       }
       break;
-    
+    //HAMSTRING
     case HAMSTRING_MOTOR_NUMBER:
       hamstring_motor->run(motor_direction_f);
       for (i = 0; i < motor_speed; i++) {
         hamstring_motor->setSpeed(i * .80);
-        //delay(5);
+        delay(5);
       }
       break;
       
@@ -229,8 +230,8 @@ void extend_forward_release(uint8_t motor_direction_f, uint8_t motor_direction_b
 // Flexes the knee backwards at a specified speed. 
 void follow_through(uint8_t motor_direction_f, uint8_t motor_direction_b, int speed) {
   Serial.println("Stepping through.");
-  increase_motor_speed(GLUTE_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed); // specifies the speed/direction pattern of active tensile elements
-}// was illio which isn't right
+  increase_motor_speed(ILIOPSOAS_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed); // specifies the speed/direction pattern of active tensile elements
+}
 
 // return_equilibrium():
 // Flexes the knee backwards at a specified speed. 
@@ -248,7 +249,8 @@ void stop_motion() {
   gluteus_motor->setSpeed(0);
   hamstring_motor->run(BRAKE); // Halt the Hamstring active tensile element
   hamstring_motor->setSpeed(0);
-  delay(100); // discharge all current through motors
+  delay(10); // discharge all current through motors <----- Shorten delay initally 10
+            //<---- Might need to change this
 }
 
 //====END OF HELPER FUNCTIONS==============================================
@@ -285,10 +287,7 @@ void loop() {
       case 's': //s for start
         Serial.print("Starting leg motion.");
         current_state = HEEL_LIFT_STATE;
-        if(current_state == HEEL_LIFT_STATE){
-          knee_flex(FORWARD, BACKWARD, 200);
-        }
-        
+    //    knee_flex(FORWARD, BACKWARD, 120);   //<---------------1
         break;
       case 'x': // x for exit
         Serial.println("Stopping all motion.");
@@ -296,6 +295,7 @@ void loop() {
         break;
       case 'p':
         Serial.print(event.orientation.x, 4);
+        Serial.println(" ");
 //        Serial.print("\tY: ");
 //        Serial.print(event.orientation.y, 4);
 //        Serial.print("\tZ: ");
@@ -303,49 +303,68 @@ void loop() {
         break;
     }
   }
-
+  ///POSSIBLY WHEN YOU GET TO THE STATE, PERFORM THE ACTION FIRST THEN THEN FOR
+  //if (point_reached(event)) {stop_motion} so that each case it's doing 
+  // what the case's motion is, bc currently it's doing the motion for the "next" instead of current.
+  
   switch (current_state) {
     case HEEL_LIFT_STATE:
+      knee_flex(FORWARD, BACKWARD, 120);   //<---------------1
       if (point_reached(event)) {
         stop_motion();
-        extend_forward(BACKWARD, FORWARD, 130);
+        Serial.print("Current state is: ");
+        Serial.println(current_state); //Should be second state (2)
+        Serial.println("should be 3rd now");
+       //<---------------2
+        //extend_forward(BACKWARD, FORWARD, 200); // REMOVE this this is just to put leg back.//<------ Ask about this
+        //since youre going to exntend past the neutral point.
       }
       break;
-      
-    default:
-      break;
-  
     case EXTENSION_FORWARD_STATE:
+      extend_forward_release(BACKWARD, FORWARD, 200); // <----- You don't need both just the top one.!!!!!!
       if (point_reached(event)) {
-        stop_motion();
-        extend_forward_release(BACKWARD, FORWARD, 180);
-      }
+        stop_motion();// <-------Maybe stop motion quick, it might be too slow, then jump to next one
+        Serial.print("Current state is: ");
+        Serial.println(current_state); 
+        Serial.println("should be 3rd now");//<---------------probably removing ^^^^
+      }  
       break;
-  
-    case EXTENSION_FORWARD_STATE_PART_2:
-      if (point_reached(event)) {
-        stop_motion();
-        follow_through(BACKWARD, FORWARD, 175);
-      }
 
-      break;
-    case FOLLOW_THROUGH_STATE:
+    case EXTENSION_FORWARD_STATE_PART_2:
+      follow_through(BACKWARD, FORWARD, 200); ///<----------3
       if (point_reached(event)) {
         stop_motion();
-        //return_equilibrium(BACKWARD, FORWARD, 200);
+        Serial.print("Current state is: ");
+        Serial.println(current_state); 
+        Serial.println("should be 4th now"); 
       }
       break;
-  }//switch
-//    case RETURN_TO_EQUILIBRIUM_STATE:
+  }// end of switch
+//      
+//    case FOLLOW_THROUGH_STATE:
+     // return_equilibrium(BACKWARD, FORWARD, 200); //<----------------4
 //      if (point_reached(event)) {
-//        stop_motion();
+        // stop_motion();
+          //Serial.print("Current state is: ");
+          //Serial.println(current_state); 
+          //Serial.println("should be 5th now");
+//        
+//        
+//      }
+//      break;
+//    case RETURN_TO_EQUILIBRIUM_STATE:  MIGHT NOT NEED THIS AT all, consider removing
+      //knee_flex(BACKWARD, FORWARD, 100);   //<---------------5
+//      if (point_reached(event)) { //<--------------JUST FOR STOPPING
+            //stop_motion();
+        //Serial.print("Current state is: ");
+        //Serial.println(current_state); 
+//        
 //      }
 //      break;
 //  }
 
 //   Constantly print out the gyroscopic readings from the BNO055
-   Serial.print("x: ");
-   Serial.println(event.orientation.x, 4);
+//   Serial.print(event.orientation.x, 4);
 //   Serial.print("\tY: ");
 //   Serial.print(event.orientation.y, 4);
 //   Serial.print("\tZ: ");
@@ -353,7 +372,6 @@ void loop() {
   old_event = event;
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }
-
 
 
 

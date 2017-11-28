@@ -164,9 +164,9 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
       break;   
     
     case GLUTE_MOTOR_NUMBER:
-      gluteus_motor->run(motor_direction_b);
-      iliopsoas_motor->run(motor_direction_f); //slowly run hip motor to lightly tight cable
-      hamstring_motor->run(motor_direction_f); //same as front hip
+      gluteus_motor->run(motor_direction_f);
+      iliopsoas_motor->run(motor_direction_b); //slowly run hip motor to lightly tight cable
+      hamstring_motor->run(motor_direction_b); //same as front hip
       for (i = 0; i < motor_speed; i++) {
         iliopsoas_motor->setSpeed(i * .40); //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
         hamstring_motor->setSpeed(i * .65);

@@ -85,7 +85,7 @@ bool targeted_bounds(sensors_event_t event) {
 bool point_reached(sensors_event_t event) {
   switch (current_state) {
     case HEEL_LIFT_STATE: // if we are in the heel lift state
-      target_theta_x_low = 30.75; target_theta_x_high = 32.75;
+      target_theta_x_low = 29.75; target_theta_x_high = 32.75;
 //      target_theta_y_low = -39.75; target_theta_y_high = -37.75;
 //      target_theta_z_low = 68.75; target_theta_z_high = 70;
       if (targeted_bounds(event)) {
@@ -105,7 +105,7 @@ bool point_reached(sensors_event_t event) {
     case EXTENSION_FORWARD_STATE_PART_2:
     //The range of values for this case are broader because the gyro jumps values too quickly
     // so the motors don't stop when they should (missed)
-      target_theta_x_low = 330.35; target_theta_x_high = 340.75;
+      target_theta_x_low = 332.35; target_theta_x_high = 344.75;
 //      target_theta_y_low = -78.75; target_theta_y_high = -78.2;
 //      target_theta_z_low = -75.75; target_theta_z_high = -75.25;
       if (targeted_bounds(event)) {
@@ -122,12 +122,12 @@ bool point_reached(sensors_event_t event) {
         return true;
       }
       break;
-    case RETURN_TO_EQUILIBRIUM_STATE:
-      target_theta_x_low = 0; target_theta_x_high = 2;
+    case EQUILIBRIUM_STATE:
+      target_theta_x_low = 0; target_theta_x_high = 3;
 //      target_theta_y_low = -38; target_theta_y_high = -36;
 //      target_theta_z_low = 89; target_theta_z_high = 91;
       if (targeted_bounds(event)) {
-        current_state = EQUILIBRIUM_STATE; // current state is now a different range
+        //current_state = RETURN_TO_EQUILIBRIUM_STATE; // if equal to last values, return true <-----
         return true;
       }
       break;
@@ -236,6 +236,7 @@ void follow_through(uint8_t motor_direction_f, uint8_t motor_direction_b, int sp
 // Flexes the knee backwards at a specified speed. 
 void return_equilibrium(uint8_t motor_direction_f, uint8_t motor_direction_b, int speed) {
   Serial.println("Return to beginning.");
+  
   increase_motor_speed(ILIOPSOAS_MOTOR_NUMBER, motor_direction_f, motor_direction_b, speed); // specifies the speed/direction pattern of active tensile elements
 }
 
@@ -332,16 +333,21 @@ void loop() {
     case FOLLOW_THROUGH_STATE:
       if (point_reached(event)) {
         stop_motion();
-        //return_equilibrium(BACKWARD, FORWARD, 200);
+        return_equilibrium(BACKWARD, FORWARD, 75);
       }
       break;
-  }//switch
-//    case RETURN_TO_EQUILIBRIUM_STATE:
-//      if (point_reached(event)) {
-//        stop_motion();
-//      }
-//      break;
-//  }
+  //switch
+    case EQUILIBRIUM_STATE:
+      if (point_reached(event)) {
+        //expected x range is: (target_theta_x_low = 0; target_theta_x_high = 3)
+//        Serial.print("X is currently: ");
+//        Serial.println(event.orientation.x, 4);
+//        Serial.println("Back to equilibrium");
+//        Serial.println("Stopping all motion");        
+        stop_motion();
+      }
+      break;
+  }//end of switch
 
 //   Constantly print out the gyroscopic readings from the BNO055
    Serial.print("x: ");

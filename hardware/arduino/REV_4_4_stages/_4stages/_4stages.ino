@@ -100,14 +100,14 @@ bool point_reached(sensors_event_t event) {
       }
       break;
     case FOLLOW_THROUGH_STATE:
-      target_theta_x_low = 18; target_theta_x_high = 20;
+      target_theta_x_low = 14; target_theta_x_high = 16;
       if (targeted_bounds(event)) {
         current_state = EQUILIBRIUM_STATE; // current state is now a different range
         return true;
       }
       break;
     case EQUILIBRIUM_STATE:
-      target_theta_x_low = 0; target_theta_x_high = 3;
+      target_theta_x_low = 357; target_theta_x_high = 359;
       if (targeted_bounds(event)) {
         //current_state = RETURN_TO_EQUILIBRIUM_STATE; // if equal to last values, return true <-----
         return true;

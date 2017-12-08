@@ -92,7 +92,7 @@ bool point_reached(sensors_event_t event) {
     case EXTENSION_FORWARD_STATE_PART_2:
     //The range of values for this case are broader because the gyro jumps values too quickly
     // so the motors don't stop when they should (missed)
-      target_theta_x_low = 336.35; target_theta_x_high = 342.75; //336.35; target_theta_x_high = 344.75;
+      target_theta_x_low = 336.35; target_theta_x_high = 343.75; //336.35; target_theta_x_high = 344.75;
 
       if (targeted_bounds(event)) {
         current_state = FOLLOW_THROUGH_STATE; // current state is now a different range
@@ -139,7 +139,7 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
       hamstring_motor->run(motor_direction_f); // mimic the back to slowly release hamstring
       for (i = 0; i < motor_speed; i++) {
         iliopsoas_motor->setSpeed(i * 1.2); //front hip motor pulls forward. 
-        gluteus_motor->setSpeed(i * .20); //rear hip motor releases simultaneously with front x2 to increase speed
+        gluteus_motor->setSpeed(i * .55); //rear hip motor releases simultaneously with front x2 to increase speed
         hamstring_motor->setSpeed(i * .65); //run to is slowly enxtend knee forward will flexing hip
         delay(5);
       }
@@ -304,7 +304,7 @@ void loop() {
     case EXTENSION_FORWARD_STATE_PART_2:
       if (point_reached(event)) {
         stop_motion();
-        follow_through(BACKWARD, FORWARD, 130); //130
+        follow_through(BACKWARD, FORWARD, 160); //130
       }
 
       break;

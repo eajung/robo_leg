@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ControlSet name="Tensegrity_Leg_CMC_muscle_control_limits">
+	<defaults/>
+	<objects>	
+		<ControlLinear name="psoas.excitation">
+			<default_min>       0.02000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+		
+		<ControlLinear name="semimembranosus.excitation">
+			<default_min>       0.02000000 </default_min>
+			<default_max>       1.00000000 </default_max>
+			<use_steps> true </use_steps>
+		</ControlLinear>
+	</objects>
+</ControlSet>

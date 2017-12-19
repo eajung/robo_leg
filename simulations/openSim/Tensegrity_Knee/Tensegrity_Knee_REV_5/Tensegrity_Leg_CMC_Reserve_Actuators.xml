@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OpenSimDocument Version="30000">
+	<ForceSet name="Tensegrity_Leg_CMC">
+		<defaults>
+			<CoordinateActuator name="default">
+				<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+				<isDisabled>false</isDisabled>
+				<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+				<min_control>-infinity</min_control>
+				<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+				<max_control>infinity</max_control>
+				<!--Name of the generalized coordinate to which the actuator applies.-->
+				<coordinate></coordinate>
+				<!--The maximum generalized force produced by this actuator.-->
+				<optimal_force>1000</optimal_force>
+			</CoordinateActuator>
+		</defaults>
+		<objects>
+			<!-- Reserve Motors to assist muscles -->
+			<CoordinateActuator name="Hip_Angle_Reserve">
+				<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+				<isDisabled>false</isDisabled>
+				<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+				<min_control>-infinity</min_control>
+				<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+				<max_control>infinity</max_control>
+				<!--Name of the generalized coordinate to which the actuator applies.-->
+				<coordinate>Hip_Angle</coordinate>
+				<!--The maximum generalized force produced by this actuator.-->
+				<optimal_force>1</optimal_force>
+			</CoordinateActuator>
+		</objects>
+		<groups />
+	</ForceSet>
+</OpenSimDocument>

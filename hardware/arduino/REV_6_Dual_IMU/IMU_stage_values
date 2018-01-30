@@ -1,0 +1,35 @@
+//IMU_stage_values.txt
+//Note: the high's are just x_low + 2.0
+
+
+
+STAGE1------------------------------------------------------------------
+    //Heel
+    target_theta_x_low = 29.75; target_theta_x_high = 32.75;      
+    //Knee
+    target_theta_x_low = 7.75; target_theta_x_high = 9.75 ;            
+
+STAGE2:------------------------------------------------------------------
+    //Heel
+    target_theta_x_low = 17; target_theta_x_high = 19;          
+    //Knee
+    target_theta_x_low = 355.06; target_theta_x_high = 357.06;        
+
+STAGE3:------------------------------------------------------------------
+      //Heel
+      target_theta_x_low = 332.35; target_theta_x_high = 344.75;  
+      //Knee
+      target_theta_x_low = 335.94; target_theta_x_high = 337.94;        
+
+STAGE4:------------------------------------------------------------------
+      //Heel
+      target_theta_x_low = 18; target_theta_x_high = 20;          
+      //Knee
+      target_theta_x_low = 21.12; target_theta_x_high = 23.12;         
+
+STAGE5:------------------------------------------------------------------
+      //Heel
+      target_theta_x_low = 0; target_theta_x_high = 3;            
+      //Knee
+      target_theta_x_low = 6.44; target_theta_x_high = 8.44;          
+-------------------------------------------------------------------------

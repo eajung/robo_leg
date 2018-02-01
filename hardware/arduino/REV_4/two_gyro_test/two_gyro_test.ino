@@ -10,6 +10,7 @@ Adafruit_BNO055 bnoB = Adafruit_BNO055(-1, BNO055_ADDRESS_B);
 
 void setup() {
    Serial.begin(115200);
+   Serial.print("Fuck");
    if(!bnoA.begin()) {
        Serial.print("Ooops, BNO055(A) not detected");
        while(1);

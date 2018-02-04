@@ -40,6 +40,8 @@ int i, current_state, theta_direction;
 float target_theta_x_low, target_theta_y_low, target_theta_z_low, target_theta_x_high, target_theta_y_high, target_theta_z_high;  
 String input; // keyboard input
 char command; // hotkey parsed from input
+
+/*
 //----in-range-array-----------------------------------
 //The 2D array is arranged as [row,column]
 //Row's are the stages
@@ -98,7 +100,7 @@ float point_range_knee[4][2] =
 { 6.44,     8.44}  // row 3
 };
 
-
+*/
 
 //-----------------------------------------------------
 //-----------------------------------------------------

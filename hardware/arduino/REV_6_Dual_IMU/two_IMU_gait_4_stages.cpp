@@ -1,6 +1,6 @@
 /*
 * File name: gait_gyro.ino
-* Author: Erik Jung
+* Author: Erik Jung and Lawrence Ngo
 * Comments: This code will provide the basis for a closed-loop feedback system
 * where the gyroscope acts as a sensor for positional feedback. Active tensile 
 * components will adjust to achieve specific angles.

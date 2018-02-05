@@ -34,6 +34,8 @@
 #define EXTENSION_FORWARD_STATE_PART_2 3
 #define FOLLOW_THROUGH_STATE 4
 #define RETURN_TO_EQUILIBRIUM_STATE 5
+#define EQUILIBRIUM_STATE_KNEE_IMU 6
+#define EQUILIBRIUM_STATE_FOOT_IMU 7
 #define BNO055_SAMPLERATE_DELAY_MS 100 // Set the delay between fresh samples
 sensors_event_t old_event;
 int i, current_state, theta_direction;
@@ -44,38 +46,38 @@ char command; // hotkey parsed from input
 //The 2D array is arranged as [row,column]
 //Row's are the stages
 
-//Lows and highs of the knee
-float point_range_heel[4][2]; //initialization
-//Stage1
-float point_range_heel[0][0] = 29.75;
-float point_range_heel[0][1] = 32.75;
-//Stage2 (range of high-low is 12 here to accounts for latency issue of gyro)
-float point_range_heel[1][0] = 332.35;
-float point_range_heel[1][1] = 344.75;
-//Stage3
-float point_range_heel[2][0] = 18.00;
-float point_range_heel[2][1] = 20.00;
-//Stage4
-float point_range_heel[3][0] = 0.00;
-float point_range_heel[3][1] = 3.00;
+// //Lows and highs of the knee
+// float point_range_heel[4][2]; //initialization
+// //Stage1
+// float point_range_heel[0][0] = 29.75;
+// float point_range_heel[0][1] = 32.75;
+// //Stage2 (range of high-low is 12 here to accounts for latency issue of gyro)
+// float point_range_heel[1][0] = 332.35;
+// float point_range_heel[1][1] = 344.75;
+// //Stage3
+// float point_range_heel[2][0] = 18.00;
+// float point_range_heel[2][1] = 20.00;
+// //Stage4
+// float point_range_heel[3][0] = 0.00;
+// float point_range_heel[3][1] = 3.00;
 
 
 
 
-//Lows and highs of the knee
-float point_range_knee[4][2]; //initialization
-//Stage1
-float point_range_knee[0][0] = 7.75;
-float point_range_knee[0][1] = 9.75;
-//Stage2
-float point_range_knee[1][0] = 335.94;
-float point_range_knee[1][1] = 337.94
-//Stage3
-float point_range_knee[2][0] = 21.12;
-float point_range_knee[2][1] = 23.12;
-//Stage4
-float point_range_knee[3][0] = 6.44;
-float point_range_knee[3][1] = 8.44;
+// //Lows and highs of the knee
+// float point_range_knee[4][2]; //initialization
+// //Stage1
+// float point_range_knee[0][0] = 7.75;
+// float point_range_knee[0][1] = 9.75;
+// //Stage2
+// float point_range_knee[1][0] = 335.94;
+// float point_range_knee[1][1] = 337.94
+// //Stage3
+// float point_range_knee[2][0] = 21.12;
+// float point_range_knee[2][1] = 23.12;
+// //Stage4
+// float point_range_knee[3][0] = 6.44;
+// float point_range_knee[3][1] = 8.44;
 
 
 //-----------------------------------------------------
@@ -118,7 +120,7 @@ Adafruit_DCMotor *hamstring_motor = AFMS.getMotor(HAMSTRING_MOTOR_NUMBER); // kn
 
 // Creating instances of BNO055
 // Adafruit_BNO055 lower_leg_tracker = Adafruit_BNO055(55);
-Adafruit_BNO055 lower_leg_tracker = Adafruit_BNO055(-1, BNO055_ADDRESS_A;
+Adafruit_BNO055 lower_leg_tracker = Adafruit_BNO055(-1, BNO055_ADDRESS_A);
 Adafruit_BNO055 knee_tracker = Adafruit_BNO055(-1, BNO055_ADDRESS_B);
 
 //=====BEGIN HELPER FUNCTIONS=======================================================

@@ -9,17 +9,7 @@
 
 
 
-
-
-
-
-
-/*******************CHANGE TO PULL FRONT HIP MOTOR UNTIL VALUS IS REACHED*************/
 /*CHANGE TENSION ELEMENTS AT KNEE REGION*/
-
-
-
-
 
 
 
@@ -64,60 +54,6 @@ char command; // hotkey parsed from input
 //----in-range-array-----------------------------------
 //The 2D array is arranged as [row,column]
 //Row's are the stages
-
-// //Lows and highs of the knee
-// float point_range_heel[4][2]; //initialization
-// //Stage1
-// float point_range_heel[0][0] = 29.75;
-// float point_range_heel[0][1] = 32.75;
-// //Stage2 (range of high-low is 12 here to accounts for latency issue of gyro)
-// float point_range_heel[1][0] = 332.35;
-// float point_range_heel[1][1] = 344.75;
-// //Stage3
-// float point_range_heel[2][0] = 18.00;
-// float point_range_heel[2][1] = 20.00;
-// //Stage4
-// float point_range_heel[3][0] = 0.00;
-// float point_range_heel[3][1] = 3.00;
-
-
-
-
-// //Lows and highs of the knee
-// float point_range_knee[4][2]; //initialization
-// //Stage1
-// float point_range_knee[0][0] = 7.75;
-// float point_range_knee[0][1] = 9.75;
-// //Stage2
-// float point_range_knee[1][0] = 335.94;
-// float point_range_knee[1][1] = 337.94
-// //Stage3
-// float point_range_knee[2][0] = 21.12;
-// float point_range_knee[2][1] = 23.12;
-// //Stage4
-// float point_range_knee[3][0] = 6.44;
-// float point_range_knee[3][1] = 8.44;
-
-
-//-----------------------------------------------------
-
-
-// float point_range_heel[4][2] =
-// {
-// { 29.75,   32.75}, // row 0
-// { 332.35, 344.75}, // row 1
-// { 18.00,   20.00}, // row 2
-// { 0.00,     3.00}  // row 3
-// };
-
-
-// float point_range_knee[4][2] =
-// {
-// { 7.75,   9.75}, // row 0
-// { 335.94 337.94}, // row 1
-// { 21.12,   23.12}, // row 2
-// { 6.44,     8.44}  // row 3
-// };
 
 
 
@@ -168,12 +104,18 @@ bool point_reached(sensors_event_t event, int check) {
     case HEEL_LIFT_STATE: // if we are in the heel lift state
       //For the KNEE_IMU
       if (check == 0){
-          target_theta_x_low = 3.00; target_theta_x_high = 5.00;
-          if (targeted_bounds(event)) {
+          target_theta_x_low = 0.00; target_theta_x_high = 2.50;
+
+          //If not in target bounds, run motors, else STOP illiopsoas <--------- (2/7/18, 10:38pm)
+          if (!(targeted_bounds(event)) { 
             // Won't move to next stage until FOOT_IMU target reached.
             // Just return true, to stop front hip motor from moving.
+            iliopsoas_motor->run(BACKWARD);                        // <--------- (2/7/18, 10:38pm)
+            iliopsoas_motor->setSpeed(i * .75);                    // <--------- (2/7/18, 10:38pm)
             Serial.println("Knee has gone out of bounds, will pull back.");
-            return true;
+            //return true;
+          }else{
+            stop_iliopsoas_motor(); // <--------- (2/7/18, 10:38pm)
           }
       }
       //For the FOOT_IMU
@@ -267,10 +209,10 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
     
     case HAMSTRING_MOTOR_NUMBER:
       hamstring_motor->run(motor_direction_f);
-      iliopsoas_motor->run(BACKWARD);
+      //iliopsoas_motor->run(BACKWARD); // <--------- (2/7/18, 10:38pm)
       for (i = 0; i < motor_speed; i++) {
         hamstring_motor->setSpeed(i * .80);
-        iliopsoas_motor->setSpeed(i * .70);
+       //  iliopsoas_motor->setSpeed(i * .70); // <--------- (2/7/18, 10:38pm)
         //delay(5);
       }
 
@@ -410,7 +352,7 @@ void loop() {
         Serial.print("Starting leg motion.");
         current_state = HEEL_LIFT_STATE;
         if(current_state == HEEL_LIFT_STATE){
-          knee_flex(FORWARD, BACKWARD, 200); //pulls illiopsoas(front-hip) & knee(hamstring) simultanesouly
+          knee_flex(FORWARD, BACKWARD, 200); //pulls  knee(hamstring) only for now
         }
         
         break;
@@ -431,7 +373,7 @@ void loop() {
     //Stage 1
     case HEEL_LIFT_STATE:
       if (point_reached(event_knee,0)){ //<---- pass value of the knee
-        //pull illiopsoas front hip motor until point reached
+        //pulls illiopsoas front hip motor if it is moved outside range
         // once point reached, just stop illopsoas motor
         stop_iliopsoas_motor();
       }

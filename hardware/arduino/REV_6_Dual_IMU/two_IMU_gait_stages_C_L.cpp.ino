@@ -107,11 +107,11 @@ bool point_reached(sensors_event_t event, int check) {
           target_theta_x_low = 0.00; target_theta_x_high = 2.50;
 
           //If not in target bounds, run motors, else STOP illiopsoas <--------- (2/7/18, 10:38pm)
-          if (!(targeted_bounds(event)) { 
+          if (!(targeted_bounds(event))){ 
             // Won't move to next stage until FOOT_IMU target reached.
             // Just return true, to stop front hip motor from moving.
             iliopsoas_motor->run(BACKWARD);                        // <--------- (2/7/18, 10:38pm)
-            iliopsoas_motor->setSpeed(i * .75);                    // <--------- (2/7/18, 10:38pm)
+            iliopsoas_motor->setSpeed(i * .25);                    // <--------- (2/7/18, 10:38pm)
             Serial.println("Knee has gone out of bounds, will pull back.");
             //return true;
           }else{
@@ -132,7 +132,7 @@ bool point_reached(sensors_event_t event, int check) {
     case EXTENSION_FORWARD_STATE_PART_2:
     //The range of values for this case are broader because the gyro jumps values too quickly
     // so the motors don't stop when they should (missed)
-      target_theta_x_low = 336.35; target_theta_x_high = 340.75; //336.35; target_theta_x_high = 344.75;
+      target_theta_x_low = 325.35; target_theta_x_high = 330.35; //336.35; target_theta_x_high = 344.75;
 
       if (targeted_bounds(event)) {
         Serial.println("Knee_IMU goal reached, now on FOLLOW_THROUGH_STATE");
@@ -140,13 +140,24 @@ bool point_reached(sensors_event_t event, int check) {
         return true;
       }
       break;
-    case FOLLOW_THROUGH_STATE:
-      target_theta_x_low = 14; target_theta_x_high = 16;
-      if (targeted_bounds(event)) {
-        Serial.println("Knee_IMU goal reached, now on EQUILIBRIUM_STATE_KNEE_IMU");
-        current_state = EQUILIBRIUM_STATE_KNEE_IMU; // current state is now a different range
+    case FOLLOW_THROUGH_STATE:		//ADDED BY ETHAN. CHECK.
+      if (check == 1) {  // foot
+	      target_theta_x_low = 20 ; target_theta_x_high = 25 ;
+	    if (targeted_bounds(event)) {	 
+        Serial.println("Foot_IMU goal reached, now on EQUILIBRIUM_STATE_KNEE_IMU");
+        current_state = EQUILIBRIUM_STATE_KNEE_IMU; // current state is now a different range     
+	      return true;
+        }
+     }
+     if (check == 0) { // knee
+      	target_theta_x_low = 14; target_theta_x_high = 16;
+      	if (targeted_bounds(event)) {
+        Serial.println("Knee_IMU goal reached, now checking on foot IMU");
+//        current_state = EQUILIBRIUM_STATE_KNEE_IMU; // current state is now a different range
         return true;
+      	}
       }
+	
       break;
     case EQUILIBRIUM_STATE_KNEE_IMU:
       target_theta_x_low = 357; target_theta_x_high = 359;
@@ -188,9 +199,9 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
       gluteus_motor->run(motor_direction_b);//BACKWARD, then forward
       hamstring_motor->run(motor_direction_f); // mimic the back to slowly release hamstring
       for (i = 0; i < motor_speed; i++) {
-        iliopsoas_motor->setSpeed(i * 1.2); //front hip motor pulls forward. 
-        gluteus_motor->setSpeed(i * .55); //rear hip motor releases simultaneously with front x2 to increase speed
-        hamstring_motor->setSpeed(i * .65); //run to is slowly enxtend knee forward will flexing hip
+        iliopsoas_motor->setSpeed(i * 1.0); //front hip motor pulls forward. 
+        gluteus_motor->setSpeed(i * .40); //rear hip motor releases simultaneously with front x2 to increase speed
+        hamstring_motor->setSpeed(i * 1.2); //run to is slowly enxtend knee forward will flexing hip
         delay(5);
       }
       break;   
@@ -200,7 +211,7 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
       iliopsoas_motor->run(motor_direction_b); //slowly run hip motor to lightly tight cable
       hamstring_motor->run(motor_direction_b); //same as front hip
       for (i = 0; i < motor_speed; i++) {
-        iliopsoas_motor->setSpeed(i * .40); //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
+        iliopsoas_motor->setSpeed(i * .55); //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
         hamstring_motor->setSpeed(i * .65);
         gluteus_motor->setSpeed(i);
         delay(5);
@@ -303,6 +314,11 @@ void stop_iliopsoas_motor() {
   iliopsoas_motor->setSpeed(0);
   delay(100); // discharge all current through motors
 }
+void stop_gluten_motor() { 			//ADDED BY ETHAN. CHECK
+  gluteus_motor->run(BRAKE); // Halt the Gluten active tensile element
+  gluteus_motor->setSpeed(0);
+  delay(100); // discharge all current through motors
+}
 
 
 //====END OF HELPER FUNCTIONS==============================================
@@ -388,12 +404,18 @@ void loop() {
     case EXTENSION_FORWARD_STATE_PART_2:
       if (point_reached(event_knee,0)) {
         stop_motion();
-        follow_through(BACKWARD, FORWARD, 160); //130
+        follow_through(BACKWARD, FORWARD, 200); //130
       }
 
       break;
     //Stage 3
-    case FOLLOW_THROUGH_STATE:
+    case FOLLOW_THROUGH_STATE:			//ADDED BY ETHAN. DOUBLE CHECK
+      if (point_reached(event_knee,0)){
+	      stop_iliopsoas_motor();
+	      stop_gluten_motor();
+//        stop_motion();
+//        return_equilibrium_knee(BACKWARD, FORWARD, 90);
+      }
       if (point_reached(event_foot,1)) {
         stop_motion();
         return_equilibrium_knee(BACKWARD, FORWARD, 90);

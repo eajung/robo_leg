@@ -102,7 +102,7 @@ void transmitData_Req(int target) {
 
 void transmitNext()
 {
-  Serial.println(count);
+  // Serial.println(count);
   transmitData_Req(count);
   count = count + 1;
   if(count>dev_number)
@@ -152,13 +152,13 @@ void loop() {
         memcpy(&z, data + 11, 4);
         
         //Serial.print(target);
-        //Serial.print(",");
+        Serial.print("IMU# ");
         Serial.print(source);
-        Serial.print(",");
+        Serial.print("  X: ");
         Serial.print(x);
-        Serial.print(",");
+        Serial.print("  Y: ");
         Serial.print(y);
-        Serial.print(",");
+        Serial.print("  Z: ");
         Serial.println(z);
         noteActivity();
         transmitNext();

@@ -6,6 +6,15 @@
 * components will adjust to achieve specific angles.
 */
 
+
+
+
+/*CHANGE TENSION ELEMENTS AT KNEE REGION*/
+
+
+
+
+
 //----------------------------------------------------- 
 // Include all libraries needed to properly run program
 // Sketch -> Include Library -> Manage Libraries
@@ -25,9 +34,9 @@
 //-----------------------------------------------------
 
 //Define any global or set variables
-#define ILIOPSOAS_MOTOR_NUMBER 1
-#define GLUTE_MOTOR_NUMBER 2
-#define HAMSTRING_MOTOR_NUMBER 3
+#define ILIOPSOAS_MOTOR_NUMBER 1 //Front motor
+#define GLUTE_MOTOR_NUMBER 2 //Rear motor
+#define HAMSTRING_MOTOR_NUMBER 3 //Hamstring
 #define EQUILIBRIUM_STATE 0
 #define HEEL_LIFT_STATE 1
 #define EXTENSION_FORWARD_STATE 2
@@ -45,60 +54,6 @@ char command; // hotkey parsed from input
 //----in-range-array-----------------------------------
 //The 2D array is arranged as [row,column]
 //Row's are the stages
-
-// //Lows and highs of the knee
-// float point_range_heel[4][2]; //initialization
-// //Stage1
-// float point_range_heel[0][0] = 29.75;
-// float point_range_heel[0][1] = 32.75;
-// //Stage2 (range of high-low is 12 here to accounts for latency issue of gyro)
-// float point_range_heel[1][0] = 332.35;
-// float point_range_heel[1][1] = 344.75;
-// //Stage3
-// float point_range_heel[2][0] = 18.00;
-// float point_range_heel[2][1] = 20.00;
-// //Stage4
-// float point_range_heel[3][0] = 0.00;
-// float point_range_heel[3][1] = 3.00;
-
-
-
-
-// //Lows and highs of the knee
-// float point_range_knee[4][2]; //initialization
-// //Stage1
-// float point_range_knee[0][0] = 7.75;
-// float point_range_knee[0][1] = 9.75;
-// //Stage2
-// float point_range_knee[1][0] = 335.94;
-// float point_range_knee[1][1] = 337.94
-// //Stage3
-// float point_range_knee[2][0] = 21.12;
-// float point_range_knee[2][1] = 23.12;
-// //Stage4
-// float point_range_knee[3][0] = 6.44;
-// float point_range_knee[3][1] = 8.44;
-
-
-//-----------------------------------------------------
-
-
-// float point_range_heel[4][2] =
-// {
-// { 29.75,   32.75}, // row 0
-// { 332.35, 344.75}, // row 1
-// { 18.00,   20.00}, // row 2
-// { 0.00,     3.00}  // row 3
-// };
-
-
-// float point_range_knee[4][2] =
-// {
-// { 7.75,   9.75}, // row 0
-// { 335.94 337.94}, // row 1
-// { 21.12,   23.12}, // row 2
-// { 6.44,     8.44}  // row 3
-// };
 
 
 
@@ -144,36 +99,70 @@ bool targeted_bounds(sensors_event_t event) {
 // point_reached():
 // By taking the readings from the gyroscope and the given current_state of our system, we return 
 // true if the orientation of the gyroscope has reached the specified angles. 
-bool point_reached(sensors_event_t event) {
+bool point_reached(sensors_event_t event, int check) {
   switch (current_state) {
     case HEEL_LIFT_STATE: // if we are in the heel lift state
-      target_theta_x_low = 29.75; target_theta_x_high = 32.75;
-      if (targeted_bounds(event)) {
-        current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range EXTENSION_FORWARD_STATE
-        return true;
+      //For the KNEE_IMU
+      if (check == 0){
+          target_theta_x_low = 0.00; target_theta_x_high = 2.50;
+
+          //If not in target bounds, run motors, else STOP illiopsoas <--------- (2/7/18, 10:38pm)
+          if (!(targeted_bounds(event))){ 
+            // Won't move to next stage until FOOT_IMU target reached.
+            // Just return true, to stop front hip motor from moving.
+            iliopsoas_motor->run(BACKWARD);                        // <--------- (2/7/18, 10:38pm)
+            iliopsoas_motor->setSpeed(i * .25);                    // <--------- (2/7/18, 10:38pm)
+            Serial.println("Knee has gone out of bounds, will pull back.");
+            //return true;
+          }else{
+            stop_iliopsoas_motor(); // <--------- (2/7/18, 10:38pm)
+          }
       }
+      //For the FOOT_IMU
+      if (check == 1){
+          target_theta_x_low = 29.75; target_theta_x_high = 32.75;
+          if (targeted_bounds(event)) {
+            Serial.println("Foot_IMU goal reached, now on EXTENSION_FORWARD_STATE_PART_2");
+            current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range EXTENSION_FORWARD_STATE
+            return true;
+          }
+      }      
       break;
       
     case EXTENSION_FORWARD_STATE_PART_2:
     //The range of values for this case are broader because the gyro jumps values too quickly
     // so the motors don't stop when they should (missed)
-      target_theta_x_low = 336.35; target_theta_x_high = 343.75; //336.35; target_theta_x_high = 344.75;
+      target_theta_x_low = 325.35; target_theta_x_high = 330.35; //336.35; target_theta_x_high = 344.75;
 
       if (targeted_bounds(event)) {
+        Serial.println("Knee_IMU goal reached, now on FOLLOW_THROUGH_STATE");
         current_state = FOLLOW_THROUGH_STATE; // current state is now a different range
         return true;
       }
       break;
-    case FOLLOW_THROUGH_STATE:
-      target_theta_x_low = 14; target_theta_x_high = 16;
-      if (targeted_bounds(event)) {
-        current_state = EQUILIBRIUM_STATE_KNEE_IMU; // current state is now a different range
+    case FOLLOW_THROUGH_STATE:		//ADDED BY ETHAN. CHECK.
+      if (check == 1) {  // foot
+	      target_theta_x_low = 20 ; target_theta_x_high = 25 ;
+	    if (targeted_bounds(event)) {	 
+        Serial.println("Foot_IMU goal reached, now on EQUILIBRIUM_STATE_KNEE_IMU");
+        current_state = EQUILIBRIUM_STATE_KNEE_IMU; // current state is now a different range     
+	      return true;
+        }
+     }
+     if (check == 0) { // knee
+      	target_theta_x_low = 14; target_theta_x_high = 16;
+      	if (targeted_bounds(event)) {
+        Serial.println("Knee_IMU goal reached, now checking on foot IMU");
+//        current_state = EQUILIBRIUM_STATE_KNEE_IMU; // current state is now a different range
         return true;
+      	}
       }
+	
       break;
     case EQUILIBRIUM_STATE_KNEE_IMU:
       target_theta_x_low = 357; target_theta_x_high = 359;
       if (targeted_bounds(event)) {
+        Serial.println("Knee_IMU goal reached, now on EQUILIBRIUM_STATE_FOOT_IMU");
         current_state = EQUILIBRIUM_STATE_FOOT_IMU;
         return true;
       }
@@ -181,6 +170,7 @@ bool point_reached(sensors_event_t event) {
     case EQUILIBRIUM_STATE_FOOT_IMU:
       target_theta_x_low = 357; target_theta_x_high = 359;
       if (targeted_bounds(event)) {
+        Serial.println("Successfully returned to equilibrium, all stages complete");
         return true;
       }
       break;
@@ -209,9 +199,9 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
       gluteus_motor->run(motor_direction_b);//BACKWARD, then forward
       hamstring_motor->run(motor_direction_f); // mimic the back to slowly release hamstring
       for (i = 0; i < motor_speed; i++) {
-        iliopsoas_motor->setSpeed(i * 1.2); //front hip motor pulls forward. 
-        gluteus_motor->setSpeed(i * .55); //rear hip motor releases simultaneously with front x2 to increase speed
-        hamstring_motor->setSpeed(i * .65); //run to is slowly enxtend knee forward will flexing hip
+        iliopsoas_motor->setSpeed(i * 1.0); //front hip motor pulls forward. 
+        gluteus_motor->setSpeed(i * .40); //rear hip motor releases simultaneously with front x2 to increase speed
+        hamstring_motor->setSpeed(i * 1.2); //run to is slowly enxtend knee forward will flexing hip
         delay(5);
       }
       break;   
@@ -221,7 +211,7 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
       iliopsoas_motor->run(motor_direction_b); //slowly run hip motor to lightly tight cable
       hamstring_motor->run(motor_direction_b); //same as front hip
       for (i = 0; i < motor_speed; i++) {
-        iliopsoas_motor->setSpeed(i * .40); //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
+        iliopsoas_motor->setSpeed(i * .55); //IF YOU CALL FORWARD FLEXION, REDUCE SPEED OF FRONT
         hamstring_motor->setSpeed(i * .65);
         gluteus_motor->setSpeed(i);
         delay(5);
@@ -230,10 +220,13 @@ void increase_motor_speed(int motor_number, uint8_t motor_direction_f,
     
     case HAMSTRING_MOTOR_NUMBER:
       hamstring_motor->run(motor_direction_f);
+      //iliopsoas_motor->run(BACKWARD); // <--------- (2/7/18, 10:38pm)
       for (i = 0; i < motor_speed; i++) {
         hamstring_motor->setSpeed(i * .80);
+       //  iliopsoas_motor->setSpeed(i * .70); // <--------- (2/7/18, 10:38pm)
         //delay(5);
       }
+
       break;
       
     default:
@@ -316,6 +309,17 @@ void stop_motion() {
   hamstring_motor->setSpeed(0);
   delay(100); // discharge all current through motors
 }
+void stop_iliopsoas_motor() {
+  iliopsoas_motor->run(BRAKE); // Halt the Iliopsoas active tensile element
+  iliopsoas_motor->setSpeed(0);
+  delay(100); // discharge all current through motors
+}
+void stop_gluten_motor() { 			//ADDED BY ETHAN. CHECK
+  gluteus_motor->run(BRAKE); // Halt the Gluten active tensile element
+  gluteus_motor->setSpeed(0);
+  delay(100); // discharge all current through motors
+}
+
 
 //====END OF HELPER FUNCTIONS==============================================
 
@@ -350,10 +354,10 @@ void setup() {
 
 void loop() {
   /* Get a new sensor event */
-  sensors_event_t event_foot;  // foot IMU
+  sensors_event_t event_foot;
   lower_leg_tracker.getEvent(&event_foot);
 
-  sensors_event_t event_knee; // knee IMU
+  sensors_event_t event_knee;
   knee_tracker.getEvent(&event_knee);
    // if serial input is ready to read input
   if (Serial.available() > 0) {
@@ -364,7 +368,7 @@ void loop() {
         Serial.print("Starting leg motion.");
         current_state = HEEL_LIFT_STATE;
         if(current_state == HEEL_LIFT_STATE){
-          knee_flex(FORWARD, BACKWARD, 200);
+          knee_flex(FORWARD, BACKWARD, 200); //pulls  knee(hamstring) only for now
         }
         
         break;
@@ -373,7 +377,10 @@ void loop() {
         stop_motion();
         break;
       case 'p'://print current gryoscopic value
-        Serial.print(event_foot.orientation.x, 4);
+        Serial.print("Event_Foot = ");
+        Serial.println(event_foot.orientation.x, 4);
+        Serial.print("Event_Knee = ");
+        Serial.println(event_knee.orientation.x, 4);
         break;
     }
   }
@@ -381,49 +388,61 @@ void loop() {
   switch (current_state) {
     //Stage 1
     case HEEL_LIFT_STATE:
-      if (point_reached(event_foot)) {
+      if (point_reached(event_knee,0)){ //<---- pass value of the knee
+        //pulls illiopsoas front hip motor if it is moved outside range
+        // once point reached, just stop illopsoas motor
+        stop_iliopsoas_motor();
+      }
+      if (point_reached(event_foot,1)) {
         stop_motion();
         extend_forward(BACKWARD, FORWARD, 130);
       }
+
       break;
   
     //Stage 2
     case EXTENSION_FORWARD_STATE_PART_2:
-      if (point_reached(event_foot)) {
+      if (point_reached(event_knee,0)) {
         stop_motion();
-        follow_through(BACKWARD, FORWARD, 160); //130
+        follow_through(BACKWARD, FORWARD, 200); //130
       }
 
       break;
     //Stage 3
-    case FOLLOW_THROUGH_STATE:
-      if (point_reached(event_foot)) {
+    case FOLLOW_THROUGH_STATE:			//ADDED BY ETHAN. DOUBLE CHECK
+      if (point_reached(event_knee,0)){
+	      stop_iliopsoas_motor();
+	      stop_gluten_motor();
+//        stop_motion();
+//        return_equilibrium_knee(BACKWARD, FORWARD, 90);
+      }
+      if (point_reached(event_foot,1)) {
         stop_motion();
         return_equilibrium_knee(BACKWARD, FORWARD, 90);
       }
       break;
     //Stage 4
     case EQUILIBRIUM_STATE_KNEE_IMU:
-      if (point_reached(event_knee)) { 
+      if (point_reached(event_knee,0)) { 
         stop_motion();
         return_equilibrium_foot(BACKWARD, FORWARD, 90);
       }
       break;
-    // Stage 5
     case EQUILIBRIUM_STATE_FOOT_IMU:
-      if (point_reached(event_foot)) {       
+      if (point_reached(event_foot,1)) {       
         stop_motion();
-        Serial.println("Final equilibrium reached.");
       }
       break;
   }//end of switch
 
 //  Constantly print out the gyroscopic readings from the BNO055
-   Serial.print("x_foot: ");
-   Serial.print(event_foot.orientation.x, 4);
-   Serial.print("   ");
    Serial.print("x_knee: ");
-   Serial.println(event_knee.orientation.x, 4);
-  old_event = event_foot;
+   Serial.print(event_knee.orientation.x, 4);
+
+   Serial.print("    x_foot: ");
+   Serial.println(event_foot.orientation.x, 4);
+   //To fixSyntax for now
+  //old_event = event_foot; // for direction_of_movement, not currently being used.
+
   delay(BNO055_SAMPLERATE_DELAY_MS);
 }

@@ -142,13 +142,21 @@ bool targeted_bounds(sensors_event_t event) {
 // point_reached():
 // By taking the readings from the gyroscope and the given current_state of our system, we return 
 // true if the orientation of the gyroscope has reached the specified angles. 
-bool point_reached(sensors_event_t event) {
+bool point_reached(sensors_event_t event, int check) {
   switch (current_state) {
     case HEEL_LIFT_STATE: // if we are in the heel lift state
-      target_theta_x_low = 29.75; target_theta_x_high = 32.75;
-      if (targeted_bounds(event)) {
-        current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range EXTENSION_FORWARD_STATE
-        return true;
+      if check == 0 {
+        target_theta_x_low = 29.75; target_theta_x_high = 32.75;
+        if (targeted_bounds(event)) {
+          current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range EXTENSION_FORWARD_STATE
+          return true;
+        }
+      }
+      else if check == 1 {
+        target_theta_x_low = 29.75; target_theta_x_high = 32.75;  // Different values go here
+        if (targeted_bounds(event)) {
+          current_state = EXTENSION_FORWARD_STATE_PART_2; // current state is now a different range EXTENSION_FORWARD_STATE
+          return true;
       }
       break;
       
@@ -380,6 +388,7 @@ void loop() {
     //Stage 1
     case HEEL_LIFT_STATE:
       if (point_reached(event)) {
+        print
         stop_motion();
         extend_forward(BACKWARD, FORWARD, 130);
       }

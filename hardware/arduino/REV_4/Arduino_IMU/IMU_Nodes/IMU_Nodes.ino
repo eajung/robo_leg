@@ -38,7 +38,7 @@ boolean protocolFailed = false;
 #define LEN_DATA 16
 byte data[LEN_DATA];
 
-int addr = 3;
+int addr = 1;
 int dev_number = 5;
 // watchdog and reset period
 unsigned long lastActivity;

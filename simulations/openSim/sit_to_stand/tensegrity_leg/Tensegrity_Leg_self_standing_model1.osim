@@ -896,7 +896,7 @@
 							<!--Name of the parent body to which this joint connects its owner body.-->
 							<parent_body>femur_stick</parent_body>
 							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
-							<location_in_parent>0 -0.28 0.02</location_in_parent>
+							<location_in_parent>0 -0.3 0.04</location_in_parent>
 							<!--Orientation of the joint in the parent body specified in the parent reference frame. Euler XYZ body-fixed rotation angles are used to express the orientation. Default is (0,0,0).-->
 							<orientation_in_parent>-0.645772 0 0</orientation_in_parent>
 							<!--Location of the joint in the child body specified in the child reference frame. For SIMM models, this vector is always the zero vector (i.e., the body reference frame coincides with the joint). -->
@@ -926,7 +926,7 @@
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
 									<transform> 0 0 0 0 0 0</transform>
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
-									<scale_factors> 1 0.5 1</scale_factors>
+									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
 									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
@@ -1439,75 +1439,6 @@
 						<show_axes>false</show_axes>
 						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
 						<display_preference>0</display_preference>
-					</VisibleObject>
-					<WrapObjectSet>
-						<objects />
-						<groups />
-					</WrapObjectSet>
-				</Body>
-				<Body name="tibia_spur">
-					<mass>0.00213188414</mass>
-					<mass_center> 0 0 0</mass_center>
-					<inertia_xx>1</inertia_xx>
-					<inertia_yy>1</inertia_yy>
-					<inertia_zz>1</inertia_zz>
-					<inertia_xy>0</inertia_xy>
-					<inertia_xz>0</inertia_xz>
-					<inertia_yz>0</inertia_yz>
-					<!--Joint that connects this body with the parent body.-->
-					<Joint>
-						<WeldJoint name="knee_stick_one_to_femur">
-							<!--Name of the parent body to which this joint connects its owner body.-->
-							<parent_body>knee_stick_y_massless</parent_body>
-							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
-							<location_in_parent>0.04 0 0</location_in_parent>
-							<!--Orientation of the joint in the parent body specified in the parent reference frame. Euler XYZ body-fixed rotation angles are used to express the orientation. Default is (0,0,0).-->
-							<orientation_in_parent>0 0 -0.523599</orientation_in_parent>
-							<!---0.523599 0 0.523599-->
-							<!--Location of the joint in the child body specified in the child reference frame. For SIMM models, this vector is always the zero vector (i.e., the body reference frame coincides with the joint). -->
-							<location>0 0 0</location>
-							<!--Orientation of the joint in the owing body specified in the owning body reference frame.  Euler XYZ body-fixed rotation angles are used to express the orientation. -->
-							<orientation>0 0 0</orientation>
-							<!--Set holding the generalized coordinates (q's) that parmeterize this joint.-->
-							<CoordinateSet>
-								<objects />
-								<groups />
-							</CoordinateSet>
-							<!--Whether the joint transform defines parent->child or child->parent.-->
-							<reverse>false</reverse>
-						</WeldJoint>
-					</Joint>
-					<VisibleObject>
-						<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
-						<GeometrySet>
-							<objects>
-								<DisplayGeometry>
-									<!--Name of geometry file .vtp, .stl, .obj-->
-									<geometry_file>cylinder.vtp</geometry_file>
-									<!--Color used to display the geometry when visible-->
-									<color> 1 0.6 0</color>
-									<!--Name of texture file .jpg, .bmp-->
-									<texture_file />
-									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
-									<transform> 0 0 0 0 0 0</transform>
-									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
-									<scale_factors> 1 1 1</scale_factors>
-									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>4</display_preference>
-									<!--Display opacity between 0.0 and 1.0-->
-									<opacity>1</opacity>
-								</DisplayGeometry>
-							</objects>
-							<groups />
-						</GeometrySet>
-						<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
-						<scale_factors> 0.05 0.15 0.05</scale_factors>
-						<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
-						<transform> 0 0 0 0 0 0</transform>
-						<!--Whether to show a coordinate frame-->
-						<show_axes>false</show_axes>
-						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-						<display_preference>4</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -3253,6 +3184,601 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
+				<Thelen2003Muscle name="knee_foot_muscle">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+					<min_control>0.02</min_control>
+					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+					<max_control>1</max_control>
+					<!--The set of points defining the path of the muscle.-->
+					<GeometryPath>
+						<!--The set of points defining the path-->
+						<PathPointSet>
+							<objects>
+								<PathPoint name="knee_foot_muscle-P1">
+									<location> 0 -0.07 0</location>
+									<body>knee_stick_one</body>
+								</PathPoint>
+								<PathPoint name="knee_foot_muscle-P2">
+									<location> 0 0.20 0</location>
+									<body>steel_beam_ground</body>
+								</PathPoint>
+							</objects>
+							<groups />
+						</PathPointSet>
+						<!--The wrap objecs that are associated with this path-->
+						<PathWrapSet>
+							<objects />
+							<groups />
+						</PathWrapSet>
+						<!--Used to display the path in the 3D window-->
+						<VisibleObject name="display">
+							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+							<GeometrySet>
+								<objects />
+								<groups />
+							</GeometrySet>
+							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+							<scale_factors> 1 1 1</scale_factors>
+							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+							<transform> 0 0 0 0 0 0</transform>
+							<!--Whether to show a coordinate frame-->
+							<show_axes>false</show_axes>
+							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+							<display_preference>4</display_preference>
+						</VisibleObject>
+					</GeometryPath>
+					<!--The maximum force this actuator can produce.-->
+					<optimal_force>1</optimal_force>
+					<!--Maximum isometric force that the fibers can generate-->
+					<max_isometric_force>0</max_isometric_force>
+					<!--Optimal length of the muscle fibers-->
+					<optimal_fiber_length>0.12823851</optimal_fiber_length>
+					<!--Resting length of the tendon-->
+					<tendon_slack_length>0.38353904</tendon_slack_length>
+					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+					<max_contraction_velocity>10</max_contraction_velocity>
+					<!--time constant for ramping up muscle activation-->
+					<activation_time_constant>0.01</activation_time_constant>
+					<!--time constant for ramping down of muscle activation-->
+					<deactivation_time_constant>0.04</deactivation_time_constant>
+					<!--tendon strain at maximum isometric muscle force-->
+					<FmaxTendonStrain>0.033</FmaxTendonStrain>
+					<!--passive muscle strain at maximum isometric muscle force-->
+					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+					<!--shape factor for Gaussian active muscle force-length relationship-->
+					<KshapeActive>0.5</KshapeActive>
+					<!--exponential shape factor for passive force-length relationship-->
+					<KshapePassive>4</KshapePassive>
+					<!--force-velocity shape factor-->
+					<Af>0.3</Af>
+					<!--maximum normalized lengthening force-->
+					<Flen>1.8</Flen>
+				</Thelen2003Muscle>
+				<Thelen2003Muscle name="inner_knee">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+					<min_control>0.02</min_control>
+					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+					<max_control>1</max_control>
+					<!--The set of points defining the path of the muscle.-->
+					<GeometryPath>
+						<!--The set of points defining the path-->
+						<PathPointSet>
+							<objects>
+								<PathPoint name="inner_knee-P1">
+									<location> 0 -0.07 0</location>
+									<body>knee_stick_one</body>
+								</PathPoint>
+								<PathPoint name="inner_knee-P2">
+									<location> 0 0.21 0</location>
+									<body>tibia_stick</body>
+								</PathPoint>
+							</objects>
+							<groups />
+						</PathPointSet>
+						<!--The wrap objecs that are associated with this path-->
+						<PathWrapSet>
+							<objects />
+							<groups />
+						</PathWrapSet>
+						<!--Used to display the path in the 3D window-->
+						<VisibleObject name="display">
+							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+							<GeometrySet>
+								<objects />
+								<groups />
+							</GeometrySet>
+							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+							<scale_factors> 1 1 1</scale_factors>
+							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+							<transform> 0 0 0 0 0 0</transform>
+							<!--Whether to show a coordinate frame-->
+							<show_axes>false</show_axes>
+							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+							<display_preference>4</display_preference>
+						</VisibleObject>
+					</GeometryPath>
+					<!--The maximum force this actuator can produce.-->
+					<optimal_force>1</optimal_force>
+					<!--Maximum isometric force that the fibers can generate-->
+					<max_isometric_force>1</max_isometric_force>
+					<!--Optimal length of the muscle fibers-->
+					<optimal_fiber_length>0.12823851</optimal_fiber_length>
+					<!--Resting length of the tendon-->
+					<tendon_slack_length>0.38353904</tendon_slack_length>
+					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+					<max_contraction_velocity>10</max_contraction_velocity>
+					<!--time constant for ramping up muscle activation-->
+					<activation_time_constant>0.01</activation_time_constant>
+					<!--time constant for ramping down of muscle activation-->
+					<deactivation_time_constant>0.04</deactivation_time_constant>
+					<!--tendon strain at maximum isometric muscle force-->
+					<FmaxTendonStrain>0.033</FmaxTendonStrain>
+					<!--passive muscle strain at maximum isometric muscle force-->
+					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+					<!--shape factor for Gaussian active muscle force-length relationship-->
+					<KshapeActive>0.5</KshapeActive>
+					<!--exponential shape factor for passive force-length relationship-->
+					<KshapePassive>4</KshapePassive>
+					<!--force-velocity shape factor-->
+					<Af>0.3</Af>
+					<!--maximum normalized lengthening force-->
+					<Flen>1.8</Flen>
+				</Thelen2003Muscle>
+				<Thelen2003Muscle name="inner_knee">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+					<min_control>0.02</min_control>
+					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+					<max_control>1</max_control>
+					<!--The set of points defining the path of the muscle.-->
+					<GeometryPath>
+						<!--The set of points defining the path-->
+						<PathPointSet>
+							<objects>
+								<PathPoint name="inner_knee-P1">
+									<location> 0 0.21 0</location>
+									<body>tibia_stick</body>
+								</PathPoint>
+								<PathPoint name="inner_knee-P2">
+									<location> 0 -0.07 0</location>
+									<body>hip_top_one</body>
+								</PathPoint>
+							</objects>
+							<groups />
+						</PathPointSet>
+						<!--The wrap objecs that are associated with this path-->
+						<PathWrapSet>
+							<objects />
+							<groups />
+						</PathWrapSet>
+						<!--Used to display the path in the 3D window-->
+						<VisibleObject name="display">
+							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+							<GeometrySet>
+								<objects />
+								<groups />
+							</GeometrySet>
+							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+							<scale_factors> 1 1 1</scale_factors>
+							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+							<transform> 0 0 0 0 0 0</transform>
+							<!--Whether to show a coordinate frame-->
+							<show_axes>false</show_axes>
+							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+							<display_preference>4</display_preference>
+						</VisibleObject>
+					</GeometryPath>
+					<!--The maximum force this actuator can produce.-->
+					<optimal_force>1</optimal_force>
+					<!--Maximum isometric force that the fibers can generate-->
+					<max_isometric_force>1</max_isometric_force>
+					<!--Optimal length of the muscle fibers-->
+					<optimal_fiber_length>0.12823851</optimal_fiber_length>
+					<!--Resting length of the tendon-->
+					<tendon_slack_length>0.38353904</tendon_slack_length>
+					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+					<max_contraction_velocity>10</max_contraction_velocity>
+					<!--time constant for ramping up muscle activation-->
+					<activation_time_constant>0.01</activation_time_constant>
+					<!--time constant for ramping down of muscle activation-->
+					<deactivation_time_constant>0.04</deactivation_time_constant>
+					<!--tendon strain at maximum isometric muscle force-->
+					<FmaxTendonStrain>0.033</FmaxTendonStrain>
+					<!--passive muscle strain at maximum isometric muscle force-->
+					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+					<!--shape factor for Gaussian active muscle force-length relationship-->
+					<KshapeActive>0.5</KshapeActive>
+					<!--exponential shape factor for passive force-length relationship-->
+					<KshapePassive>4</KshapePassive>
+					<!--force-velocity shape factor-->
+					<Af>0.3</Af>
+					<!--maximum normalized lengthening force-->
+					<Flen>1.8</Flen>
+				</Thelen2003Muscle>
+				<Thelen2003Muscle name="calf_muscle-1">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+					<min_control>0.02</min_control>
+					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+					<max_control>1</max_control>
+					<!--The set of points defining the path of the muscle.-->
+					<GeometryPath>
+						<!--The set of points defining the path-->
+						<PathPointSet>
+							<objects>
+								<PathPoint name="calf_muscle-1-P1">
+									<location> 0 -0.07 0</location>
+									<body>knee_stick_two</body>
+								</PathPoint>
+								<PathPoint name="calf_muscle-1-P2">
+									<location> 0 -0.20 0</location>
+									<body>steel_beam_ground</body>
+								</PathPoint>
+							</objects>
+							<groups />
+						</PathPointSet>
+						<!--The wrap objecs that are associated with this path-->
+						<PathWrapSet>
+							<objects />
+							<groups />
+						</PathWrapSet>
+						<!--Used to display the path in the 3D window-->
+						<VisibleObject name="display">
+							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+							<GeometrySet>
+								<objects />
+								<groups />
+							</GeometrySet>
+							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+							<scale_factors> 1 1 1</scale_factors>
+							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+							<transform> 0 0 0 0 0 0</transform>
+							<!--Whether to show a coordinate frame-->
+							<show_axes>false</show_axes>
+							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+							<display_preference>4</display_preference>
+						</VisibleObject>
+					</GeometryPath>
+					<!--The maximum force this actuator can produce.-->
+					<optimal_force>1</optimal_force>
+					<!--Maximum isometric force that the fibers can generate-->
+					<max_isometric_force>0</max_isometric_force>
+					<!--Optimal length of the muscle fibers-->
+					<optimal_fiber_length>0.12823851</optimal_fiber_length>
+					<!--Resting length of the tendon-->
+					<tendon_slack_length>0.38353904</tendon_slack_length>
+					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+					<max_contraction_velocity>10</max_contraction_velocity>
+					<!--time constant for ramping up muscle activation-->
+					<activation_time_constant>0.01</activation_time_constant>
+					<!--time constant for ramping down of muscle activation-->
+					<deactivation_time_constant>0.04</deactivation_time_constant>
+					<!--tendon strain at maximum isometric muscle force-->
+					<FmaxTendonStrain>0.033</FmaxTendonStrain>
+					<!--passive muscle strain at maximum isometric muscle force-->
+					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+					<!--shape factor for Gaussian active muscle force-length relationship-->
+					<KshapeActive>0.5</KshapeActive>
+					<!--exponential shape factor for passive force-length relationship-->
+					<KshapePassive>4</KshapePassive>
+					<!--force-velocity shape factor-->
+					<Af>0.3</Af>
+					<!--maximum normalized lengthening force-->
+					<Flen>1.8</Flen>
+				</Thelen2003Muscle>
+				<Thelen2003Muscle name="calf_muscle-2">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+					<min_control>0.02</min_control>
+					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+					<max_control>1</max_control>
+					<!--The set of points defining the path of the muscle.-->
+					<GeometryPath>
+						<!--The set of points defining the path-->
+						<PathPointSet>
+							<objects>
+								<PathPoint name="calf_muscle-2-P1">
+									<location> 0 -0.07 0</location>
+									<body>knee_stick_three</body>
+								</PathPoint>
+								<PathPoint name="calf_muscle-2-P2">
+									<location> 0 -0.20 0</location>
+									<body>steel_beam_ground</body>
+								</PathPoint>
+							</objects>
+							<groups />
+						</PathPointSet>
+						<!--The wrap objecs that are associated with this path-->
+						<PathWrapSet>
+							<objects />
+							<groups />
+						</PathWrapSet>
+						<!--Used to display the path in the 3D window-->
+						<VisibleObject name="display">
+							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+							<GeometrySet>
+								<objects />
+								<groups />
+							</GeometrySet>
+							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+							<scale_factors> 1 1 1</scale_factors>
+							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+							<transform> 0 0 0 0 0 0</transform>
+							<!--Whether to show a coordinate frame-->
+							<show_axes>false</show_axes>
+							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+							<display_preference>4</display_preference>
+						</VisibleObject>
+					</GeometryPath>
+					<!--The maximum force this actuator can produce.-->
+					<optimal_force>1</optimal_force>
+					<!--Maximum isometric force that the fibers can generate-->
+					<max_isometric_force>0</max_isometric_force>
+					<!--Optimal length of the muscle fibers-->
+					<optimal_fiber_length>0.12823851</optimal_fiber_length>
+					<!--Resting length of the tendon-->
+					<tendon_slack_length>0.38353904</tendon_slack_length>
+					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+					<max_contraction_velocity>10</max_contraction_velocity>
+					<!--time constant for ramping up muscle activation-->
+					<activation_time_constant>0.01</activation_time_constant>
+					<!--time constant for ramping down of muscle activation-->
+					<deactivation_time_constant>0.04</deactivation_time_constant>
+					<!--tendon strain at maximum isometric muscle force-->
+					<FmaxTendonStrain>0.033</FmaxTendonStrain>
+					<!--passive muscle strain at maximum isometric muscle force-->
+					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+					<!--shape factor for Gaussian active muscle force-length relationship-->
+					<KshapeActive>0.5</KshapeActive>
+					<!--exponential shape factor for passive force-length relationship-->
+					<KshapePassive>4</KshapePassive>
+					<!--force-velocity shape factor-->
+					<Af>0.3</Af>
+					<!--maximum normalized lengthening force-->
+					<Flen>1.8</Flen>
+				</Thelen2003Muscle>
+				<Thelen2003Muscle name="knee_three_to_hip_four">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+					<min_control>0.02</min_control>
+					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+					<max_control>1</max_control>
+					<!--The set of points defining the path of the muscle.-->
+					<GeometryPath>
+						<!--The set of points defining the path-->
+						<PathPointSet>
+							<objects>
+								<PathPoint name="knee_three_to_hip_four-P1">
+									<location> 0 -0.07 0</location>
+									<body>knee_stick_three</body>
+								</PathPoint>
+								<PathPoint name="knee_three_to_hip_four-P2">
+									<location> 0 -0.07 0</location>
+									<body>hip_top_four</body>
+								</PathPoint>
+							</objects>
+							<groups />
+						</PathPointSet>
+						<!--The wrap objecs that are associated with this path-->
+						<PathWrapSet>
+							<objects />
+							<groups />
+						</PathWrapSet>
+						<!--Used to display the path in the 3D window-->
+						<VisibleObject name="display">
+							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+							<GeometrySet>
+								<objects />
+								<groups />
+							</GeometrySet>
+							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+							<scale_factors> 1 1 1</scale_factors>
+							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+							<transform> 0 0 0 0 0 0</transform>
+							<!--Whether to show a coordinate frame-->
+							<show_axes>false</show_axes>
+							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+							<display_preference>4</display_preference>
+						</VisibleObject>
+					</GeometryPath>
+					<!--The maximum force this actuator can produce.-->
+					<optimal_force>1</optimal_force>
+					<!--Maximum isometric force that the fibers can generate-->
+					<max_isometric_force>0</max_isometric_force>
+					<!--Optimal length of the muscle fibers-->
+					<optimal_fiber_length>0.12823851</optimal_fiber_length>
+					<!--Resting length of the tendon-->
+					<tendon_slack_length>0.38353904</tendon_slack_length>
+					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+					<max_contraction_velocity>10</max_contraction_velocity>
+					<!--time constant for ramping up muscle activation-->
+					<activation_time_constant>0.01</activation_time_constant>
+					<!--time constant for ramping down of muscle activation-->
+					<deactivation_time_constant>0.04</deactivation_time_constant>
+					<!--tendon strain at maximum isometric muscle force-->
+					<FmaxTendonStrain>0.033</FmaxTendonStrain>
+					<!--passive muscle strain at maximum isometric muscle force-->
+					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+					<!--shape factor for Gaussian active muscle force-length relationship-->
+					<KshapeActive>0.5</KshapeActive>
+					<!--exponential shape factor for passive force-length relationship-->
+					<KshapePassive>4</KshapePassive>
+					<!--force-velocity shape factor-->
+					<Af>0.3</Af>
+					<!--maximum normalized lengthening force-->
+					<Flen>1.8</Flen>
+				</Thelen2003Muscle>
+				
+				<Thelen2003Muscle name="knee_two_to_hip_two">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+					<min_control>0.02</min_control>
+					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+					<max_control>1</max_control>
+					<!--The set of points defining the path of the muscle.-->
+					<GeometryPath>
+						<!--The set of points defining the path-->
+						<PathPointSet>
+							<objects>
+								<PathPoint name="knee_two_to_hip_two-P1">
+									<location> 0 -0.07 0</location>
+									<body>knee_stick_two</body>
+								</PathPoint>
+								<PathPoint name="knee_two_to_hip_two-P2">
+									<location> 0 -0.07 0</location>
+									<body>hip_top_two</body>
+								</PathPoint>
+							</objects>
+							<groups />
+						</PathPointSet>
+						<!--The wrap objecs that are associated with this path-->
+						<PathWrapSet>
+							<objects />
+							<groups />
+						</PathWrapSet>
+						<!--Used to display the path in the 3D window-->
+						<VisibleObject name="display">
+							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+							<GeometrySet>
+								<objects />
+								<groups />
+							</GeometrySet>
+							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+							<scale_factors> 1 1 1</scale_factors>
+							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+							<transform> 0 0 0 0 0 0</transform>
+							<!--Whether to show a coordinate frame-->
+							<show_axes>false</show_axes>
+							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+							<display_preference>4</display_preference>
+						</VisibleObject>
+					</GeometryPath>
+					<!--The maximum force this actuator can produce.-->
+					<optimal_force>1</optimal_force>
+					<!--Maximum isometric force that the fibers can generate-->
+					<max_isometric_force>0</max_isometric_force>
+					<!--Optimal length of the muscle fibers-->
+					<optimal_fiber_length>0.12823851</optimal_fiber_length>
+					<!--Resting length of the tendon-->
+					<tendon_slack_length>0.38353904</tendon_slack_length>
+					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+					<max_contraction_velocity>10</max_contraction_velocity>
+					<!--time constant for ramping up muscle activation-->
+					<activation_time_constant>0.01</activation_time_constant>
+					<!--time constant for ramping down of muscle activation-->
+					<deactivation_time_constant>0.04</deactivation_time_constant>
+					<!--tendon strain at maximum isometric muscle force-->
+					<FmaxTendonStrain>0.033</FmaxTendonStrain>
+					<!--passive muscle strain at maximum isometric muscle force-->
+					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+					<!--shape factor for Gaussian active muscle force-length relationship-->
+					<KshapeActive>0.5</KshapeActive>
+					<!--exponential shape factor for passive force-length relationship-->
+					<KshapePassive>4</KshapePassive>
+					<!--force-velocity shape factor-->
+					<Af>0.3</Af>
+					<!--maximum normalized lengthening force-->
+					<Flen>1.8</Flen>
+				</Thelen2003Muscle>
+				
+				<Thelen2003Muscle name="inner_knee">
+					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
+					<isDisabled>false</isDisabled>
+					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
+					<min_control>0.02</min_control>
+					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
+					<max_control>1</max_control>
+					<!--The set of points defining the path of the muscle.-->
+					<GeometryPath>
+						<!--The set of points defining the path-->
+						<PathPointSet>
+							<objects>
+								<PathPoint name="inner_knee-P1">
+									<location> 0 0.21 0</location>
+									<body>tibia_stick</body>
+								</PathPoint>
+								<PathPoint name="inner_knee-P2">
+									<location> 0 -0.07 0</location>
+									<body>hip_top_three</body>
+								</PathPoint>
+							</objects>
+							<groups />
+						</PathPointSet>
+						<!--The wrap objecs that are associated with this path-->
+						<PathWrapSet>
+							<objects />
+							<groups />
+						</PathWrapSet>
+						<!--Used to display the path in the 3D window-->
+						<VisibleObject name="display">
+							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
+							<GeometrySet>
+								<objects />
+								<groups />
+							</GeometrySet>
+							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
+							<scale_factors> 1 1 1</scale_factors>
+							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
+							<transform> 0 0 0 0 0 0</transform>
+							<!--Whether to show a coordinate frame-->
+							<show_axes>false</show_axes>
+							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+							<display_preference>4</display_preference>
+						</VisibleObject>
+					</GeometryPath>
+					<!--The maximum force this actuator can produce.-->
+					<optimal_force>1</optimal_force>
+					<!--Maximum isometric force that the fibers can generate-->
+					<max_isometric_force>1</max_isometric_force>
+					<!--Optimal length of the muscle fibers-->
+					<optimal_fiber_length>0.12823851</optimal_fiber_length>
+					<!--Resting length of the tendon-->
+					<tendon_slack_length>0.38353904</tendon_slack_length>
+					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
+					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
+					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
+					<max_contraction_velocity>10</max_contraction_velocity>
+					<!--time constant for ramping up muscle activation-->
+					<activation_time_constant>0.01</activation_time_constant>
+					<!--time constant for ramping down of muscle activation-->
+					<deactivation_time_constant>0.04</deactivation_time_constant>
+					<!--tendon strain at maximum isometric muscle force-->
+					<FmaxTendonStrain>0.033</FmaxTendonStrain>
+					<!--passive muscle strain at maximum isometric muscle force-->
+					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
+					<!--shape factor for Gaussian active muscle force-length relationship-->
+					<KshapeActive>0.5</KshapeActive>
+					<!--exponential shape factor for passive force-length relationship-->
+					<KshapePassive>4</KshapePassive>
+					<!--force-velocity shape factor-->
+					<Af>0.3</Af>
+					<!--maximum normalized lengthening force-->
+					<Flen>1.8</Flen>
+				</Thelen2003Muscle>
+				
 				<Thelen2003Muscle name="knee_two_to_tibia">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>true</isDisabled>
@@ -3623,80 +4149,7 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				<Thelen2003Muscle name="psoas">
-					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
-					<isDisabled>false</isDisabled>
-					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
-					<min_control>0.02</min_control>
-					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
-					<max_control>1</max_control>
-					<!--The set of points defining the path of the muscle.-->
-					<GeometryPath>
-						<!--The set of points defining the path-->
-						<PathPointSet>
-							<objects>
-								<PathPoint name="psoas-P1">
-									<location> 0 0.4 0</location>
-									<body>steel_beam</body>
-								</PathPoint>
-								<PathPoint name="psoas-P2">
-									<location> 0 0.1 0</location>
-									<body>femur_stick</body>
-								</PathPoint>
-							</objects>
-							<groups />
-						</PathPointSet>
-						<!--The wrap objecs that are associated with this path-->
-						<PathWrapSet>
-							<objects />
-							<groups />
-						</PathWrapSet>
-						<!--Used to display the path in the 3D window-->
-						<VisibleObject name="display">
-							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
-							<GeometrySet>
-								<objects />
-								<groups />
-							</GeometrySet>
-							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
-							<scale_factors> 1 1 1</scale_factors>
-							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
-							<transform> 0 0 0 0 0 0</transform>
-							<!--Whether to show a coordinate frame-->
-							<show_axes>false</show_axes>
-							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-							<display_preference>4</display_preference>
-						</VisibleObject>
-					</GeometryPath>
-					<!--The maximum force this actuator can produce.-->
-					<optimal_force>1</optimal_force>
-					<!--Maximum isometric force that the fibers can generate-->
-					<max_isometric_force>75</max_isometric_force>
-					<!--Optimal length of the muscle fibers-->
-					<optimal_fiber_length>0.12823851</optimal_fiber_length>
-					<!--Resting length of the tendon-->
-					<tendon_slack_length>0.38353904</tendon_slack_length>
-					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
-					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
-					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
-					<max_contraction_velocity>10</max_contraction_velocity>
-					<!--time constant for ramping up muscle activation-->
-					<activation_time_constant>0.01</activation_time_constant>
-					<!--time constant for ramping down of muscle activation-->
-					<deactivation_time_constant>0.04</deactivation_time_constant>
-					<!--tendon strain at maximum isometric muscle force-->
-					<FmaxTendonStrain>0.033</FmaxTendonStrain>
-					<!--passive muscle strain at maximum isometric muscle force-->
-					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
-					<!--shape factor for Gaussian active muscle force-length relationship-->
-					<KshapeActive>0.5</KshapeActive>
-					<!--exponential shape factor for passive force-length relationship-->
-					<KshapePassive>4</KshapePassive>
-					<!--force-velocity shape factor-->
-					<Af>0.3</Af>
-					<!--maximum normalized lengthening force-->
-					<Flen>1.8</Flen>
-				</Thelen2003Muscle>
+				
 				<Thelen2003Muscle name="psoas_cable_one">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>true</isDisabled>
@@ -3845,80 +4298,7 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				<Thelen2003Muscle name="semimembranosus">
-					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
-					<isDisabled>false</isDisabled>
-					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
-					<min_control>0.02</min_control>
-					<!--Maximum allowed value for control signal. Used primarily when solving for control values.-->
-					<max_control>1</max_control>
-					<!--The set of points defining the path of the muscle.-->
-					<GeometryPath>
-						<!--The set of points defining the path-->
-						<PathPointSet>
-							<objects>
-								<PathPoint name="psoas-P1">
-									<location> 0 -0.4 0</location>
-									<body>steel_beam</body>
-								</PathPoint>
-								<PathPoint name="psoas-P2">
-									<location> 0 0.1 0</location>
-									<body>femur_stick</body>
-								</PathPoint>
-							</objects>
-							<groups />
-						</PathPointSet>
-						<!--The wrap objecs that are associated with this path-->
-						<PathWrapSet>
-							<objects />
-							<groups />
-						</PathWrapSet>
-						<!--Used to display the path in the 3D window-->
-						<VisibleObject name="display">
-							<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
-							<GeometrySet>
-								<objects />
-								<groups />
-							</GeometrySet>
-							<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
-							<scale_factors> 1 1 1</scale_factors>
-							<!--transform relative to owner specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
-							<transform> 0 0 0 0 0 0</transform>
-							<!--Whether to show a coordinate frame-->
-							<show_axes>false</show_axes>
-							<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-							<display_preference>4</display_preference>
-						</VisibleObject>
-					</GeometryPath>
-					<!--The maximum force this actuator can produce.-->
-					<optimal_force>1</optimal_force>
-					<!--Maximum isometric force that the fibers can generate-->
-					<max_isometric_force>75</max_isometric_force>
-					<!--Optimal length of the muscle fibers-->
-					<optimal_fiber_length>0.12823851</optimal_fiber_length>
-					<!--Resting length of the tendon-->
-					<tendon_slack_length>0.38353904</tendon_slack_length>
-					<!--Angle between tendon and fibers at optimal fiber length expressed in radians-->
-					<pennation_angle_at_optimal>0</pennation_angle_at_optimal>
-					<!--Maximum contraction velocity of the fibers, in optimal fiberlengths/second-->
-					<max_contraction_velocity>10</max_contraction_velocity>
-					<!--time constant for ramping up muscle activation-->
-					<activation_time_constant>0.01</activation_time_constant>
-					<!--time constant for ramping down of muscle activation-->
-					<deactivation_time_constant>0.04</deactivation_time_constant>
-					<!--tendon strain at maximum isometric muscle force-->
-					<FmaxTendonStrain>0.033</FmaxTendonStrain>
-					<!--passive muscle strain at maximum isometric muscle force-->
-					<FmaxMuscleStrain>0.6</FmaxMuscleStrain>
-					<!--shape factor for Gaussian active muscle force-length relationship-->
-					<KshapeActive>0.5</KshapeActive>
-					<!--exponential shape factor for passive force-length relationship-->
-					<KshapePassive>4</KshapePassive>
-					<!--force-velocity shape factor-->
-					<Af>0.3</Af>
-					<!--maximum normalized lengthening force-->
-					<Flen>1.8</Flen>
-				</Thelen2003Muscle>
+				
 				<Thelen2003Muscle name="semimembranosus_cable_one">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>true</isDisabled>
@@ -4821,7 +5201,7 @@
 							<objects>
 								<PathPoint name="calf_cable_one_ground-P1">
 									<location> 0 0.07 0</location>
-									<body>foot_stick_two</body>
+									<body>ankle_bottom_two</body>
 								</PathPoint>
 								<PathPoint name="calf_cable_one_ground-P2">
 									<location> 0.0102242 -0.07 0</location>
@@ -4895,7 +5275,7 @@
 							<objects>
 								<PathPoint name="calf_cable_two_ground-P1">
 									<location> 0 -0.07 0</location>
-									<body>foot_stick_three</body>
+									<body>ankle_bottom_four</body>
 								</PathPoint>
 								<PathPoint name="calf_cable_two_ground-P2">
 									<location> 0.0102242 0.07 0</location>
@@ -7317,7 +7697,7 @@
 							<objects>
 								<PathPoint name="ankle_cable_one_ground-P1">
 									<location> 0 0.07 0</location>
-									<body>foot_stick_two</body>
+									<body>ankle_bottom_two</body>
 								</PathPoint>
 								<PathPoint name="ankle_cable_one_ground-P2">
 									<location> 0.0102242 -0.07 0</location>
@@ -7370,7 +7750,7 @@
 							<objects>
 								<PathPoint name="ankle_cable_two_ground-P1">
 									<location> 0 0.07 0</location>
-									<body>foot_stick_three</body>
+									<body>ankle_bottom_four</body>
 								</PathPoint>
 								<PathPoint name="ankle_cable_two_ground-P2">
 									<location> 0.0102242 0.07 0</location>
@@ -7423,7 +7803,7 @@
 							<objects>
 								<PathPoint name="ankle_cable_three_ground-P1">
 									<location> 0 0.07 0</location>
-									<body>foot_stick_two</body>
+									<body>ankle_bottom_one</body>
 								</PathPoint>
 								<PathPoint name="ankle_cable_three_ground-P2">
 									<location> 0.0102242 -0.07 0</location>
@@ -7476,7 +7856,7 @@
 							<objects>
 								<PathPoint name="ankle_cable_four_ground-P1">
 									<location> 0 0.07 0</location>
-									<body>foot_stick_three</body>
+									<body>ankle_bottom_three</body>
 								</PathPoint>
 								<PathPoint name="ankle_cable_four_ground-P2">
 									<location> 0.0102242 0.07 0</location>

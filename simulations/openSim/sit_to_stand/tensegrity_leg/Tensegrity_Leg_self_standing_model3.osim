@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <OpenSimDocument Version="30000">
-<!--		<xs:element name="scale_factor" type="xs:decimal"/>
-		<scale_factor>1</scale_factor> -->
 	<Model name="Tensegrity_Knee_Rev_tibia_spur">
-
 		<credits>Erik Jung, Lawrence Ngo, Nicholas Cessna, Chris Cheney, Adam Buderi.</credits>
 		<length_units>meters</length_units>
 		<force_units>N</force_units>
 		<!--Acceleration due to gravity.-->
 		<gravity> 0 -9.80665 0</gravity>
-		<xs:element name="scale_variable" type="xs:decimal"/>
-		<scale_variable>0.25</scale_variable>
 		<!--Bodies in the model.-->
 		<BodySet>
 			<objects>
@@ -39,7 +34,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>0</display_preference>
+									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -658,7 +653,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>0</display_preference>
+									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -672,7 +667,7 @@
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
 						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-						<display_preference>0</display_preference>
+						<display_preference>4</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -1143,7 +1138,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>0</display_preference>
+									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -1157,7 +1152,7 @@
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
 						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-						<display_preference>0</display_preference>
+						<display_preference>4</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -1342,8 +1337,6 @@
 									<color> 0.4 0.4 0.4</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
-									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
-									<result><scale_factors><xsl:value-of select="$scale_variable"/> <xsl:value-of select="$scale_variable"/> <xsl:value-of select="$scale_variable"/></scale_factors></result>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
 									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
@@ -1424,7 +1417,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>0</display_preference>
+									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -1438,7 +1431,7 @@
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
 						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-						<display_preference>0</display_preference>
+						<display_preference>4</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -2536,7 +2529,7 @@
 								</PathPoint>
 								<PathPoint name="low_knee-P2">
 									<location> 0 0.07 0</location>
-				<body>knee_stick_y_one</body>
+									<body>knee_stick_y_one</body>
 								</PathPoint>
 							</objects>
 							<groups />
@@ -5700,7 +5693,6 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				
 				<Ligament name="quad_cable_one_ligament">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>false</isDisabled>
@@ -7940,8 +7932,8 @@
 									<body>ankle_bottom_one</body>
 								</PathPoint>
 								<PathPoint name="ankle_bottom_one_ground_to_tibia-P2">
-									<body>femur_stick</body>
 									<location> 0 -0.24 0</location>
+									<body>femur_stick</body>
 								</PathPoint>
 							</objects>
 							<groups />
@@ -7980,7 +7972,6 @@
 						<y> 0 0 0 0 0.00083333 0.00333333 0.0075 0.0133333 0.0208333 0.03 0.04 0.07 0.1 0.12 0.17 0.37 0.67 0.97</y>
 					</SimmSpline>
 				</Ligament>
-				
 			</objects>
 			<groups />
 		</ForceSet>

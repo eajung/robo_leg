@@ -3184,7 +3184,7 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				<Thelen2003Muscle name="knee_foot_muscle">
+				<Thelen2003Muscle name="tibialis">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>false</isDisabled>
 					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
@@ -3196,11 +3196,11 @@
 						<!--The set of points defining the path-->
 						<PathPointSet>
 							<objects>
-								<PathPoint name="knee_foot_muscle-P1">
+								<PathPoint name="tibialis-P1">
 									<location> 0 -0.07 0</location>
 									<body>knee_stick_one</body>
 								</PathPoint>
-								<PathPoint name="knee_foot_muscle-P2">
+								<PathPoint name="tibialis-P2">
 									<location> 0 0.20 0</location>
 									<body>steel_beam_ground</body>
 								</PathPoint>
@@ -3332,7 +3332,7 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				<Thelen2003Muscle name="inner_knee">
+				<Thelen2003Muscle name="hamstring_one">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>false</isDisabled>
 					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
@@ -3344,11 +3344,11 @@
 						<!--The set of points defining the path-->
 						<PathPointSet>
 							<objects>
-								<PathPoint name="inner_knee-P1">
+								<PathPoint name="hamstring_one-P1">
 									<location> 0 0.21 0</location>
 									<body>tibia_stick</body>
 								</PathPoint>
-								<PathPoint name="inner_knee-P2">
+								<PathPoint name="hamstring_one-P2">
 									<location> 0 -0.07 0</location>
 									<body>hip_top_one</body>
 								</PathPoint>
@@ -3703,8 +3703,7 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				
-				<Thelen2003Muscle name="inner_knee">
+				<Thelen2003Muscle name="hamstring_two">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>false</isDisabled>
 					<!--Minimum allowed value for control signal. Used primarily when solving for control values.-->
@@ -3716,11 +3715,11 @@
 						<!--The set of points defining the path-->
 						<PathPointSet>
 							<objects>
-								<PathPoint name="inner_knee-P1">
+								<PathPoint name="hamstring_two-P1">
 									<location> 0 0.21 0</location>
 									<body>tibia_stick</body>
 								</PathPoint>
-								<PathPoint name="inner_knee-P2">
+								<PathPoint name="hamstring_two-P2">
 									<location> 0 -0.07 0</location>
 									<body>hip_top_three</body>
 								</PathPoint>
@@ -3777,8 +3776,7 @@
 					<Af>0.3</Af>
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
-				</Thelen2003Muscle>
-				
+				</Thelen2003Muscle>				
 				<Thelen2003Muscle name="knee_two_to_tibia">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>true</isDisabled>

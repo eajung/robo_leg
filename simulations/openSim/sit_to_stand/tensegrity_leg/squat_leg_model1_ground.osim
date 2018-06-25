@@ -2,7 +2,7 @@
 <OpenSimDocument Version="30000">
 <!--		<xs:element name="scale_factor" type="xs:decimal"/>
 		<scale_factor>1</scale_factor> -->
-	<Model name="Tensegrity_Knee_model1">
+	<Model name="model1_grounded">
 
 		<credits>Erik Jung, Lawrence Ngo, Nicholas Cessna, Chris Cheney, Adam Buderi.</credits>
 		<length_units>meters</length_units>
@@ -1116,7 +1116,7 @@
 										<!--The value of this coordinate before any value has been set. Rotational coordinate value is in radians and Translational in meters.-->
 										<default_value>0</default_value>
 										<!--The minimum and maximum values that the coordinate can range between. Rotational coordinate range in radians and Translational in meters.-->
-										<range>-2.44346095279206 0</range>
+										<range>0 2.44346095279206</range>
 										<!--Flag indicating whether or not the values of the coordinates should be prescribed according to the function above. It is ignored if the no prescribed function is specified.-->
 										<prescribed>false</prescribed>
 									</Coordinate>
@@ -1391,13 +1391,13 @@
 							<!--Set holding the generalized coordinates (q's) that parmeterize this joint.-->
 							<CoordinateSet>
 								<objects>
-									<Coordinate name="Knee_Angle">
+									<Coordinate name="Ankle_Angle">
 										<!--Coordinate can describe rotational, translational, or coupled motion. Defaults to rotational.-->
 										<motion_type>rotational</motion_type>
 										<!--The value of this coordinate before any value has been set. Rotational coordinate value is in radians and Translational in meters.-->
 										<default_value>0</default_value>
 										<!--The minimum and maximum values that the coordinate can range between. Rotational coordinate range in radians and Translational in meters.-->
-										<range>-2.44346095279206 0</range>
+										<range>-2.44346095279206 2.44346095279206</range>
 										<!--Flag indicating whether or not the values of the coordinates should be prescribed according to the function above. It is ignored if the no prescribed function is specified.-->
 										<prescribed>false</prescribed>
 									</Coordinate>

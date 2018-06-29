@@ -821,25 +821,35 @@
 					<inertia_yz>0</inertia_yz>
 					<!--Joint that connects this body with the parent body.-->
 					<Joint>
-						<WeldJoint name="femur_stick_to_hip_y">
+						<PinJoint name="femur_stick_to_hip_y">
 							<!--Name of the parent body to which this joint connects its owner body.-->
 							<parent_body>knee_stick_y_massless</parent_body>
 							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
-							<location_in_parent>0 0.35 0</location_in_parent>
+							<location_in_parent>0 0.15 0</location_in_parent>
 							<!--Orientation of the joint in the parent body specified in the parent reference frame. Euler XYZ body-fixed rotation angles are used to express the orientation. Default is (0,0,0).-->
-							<orientation_in_parent>0 -1.5708 0</orientation_in_parent>
+							<orientation_in_parent>0 0 0</orientation_in_parent>
 							<!--Location of the joint in the child body specified in the child reference frame. For SIMM models, this vector is always the zero vector (i.e., the body reference frame coincides with the joint). -->
-							<location>0 0 0</location>
+							<location>0 -0.3 0</location>
 							<!--Orientation of the joint in the owing body specified in the owning body reference frame.  Euler XYZ body-fixed rotation angles are used to express the orientation. -->
-							<orientation>0 0 0</orientation>
+							<orientation>0 1.5708 0</orientation>
 							<!--Set holding the generalized coordinates (q's) that parmeterize this joint.-->
 							<CoordinateSet>
-								<objects />
-								<groups />
+								<objects>
+									<Coordinate name="Knee_Angle">
+										<!--Coordinate can describe rotational, translational, or coupled motion. Defaults to rotational.-->
+										<motion_type>rotational</motion_type>
+										<!--The value of this coordinate before any value has been set. Rotational coordinate value is in radians and Translational in meters.-->
+										<default_value>0</default_value>
+										<!--The minimum and maximum values that the coordinate can range between. Rotational coordinate range in radians and Translational in meters.-->
+										<range>-2.44346095279206 0</range>
+										<!--Flag indicating whether or not the values of the coordinates should be prescribed according to the function above. It is ignored if the no prescribed function is specified.-->
+										<prescribed>false</prescribed>
+									</Coordinate>
+								</objects>
 							</CoordinateSet>
 							<!--Whether the joint transform defines parent->child or child->parent.-->
 							<reverse>false</reverse>
-						</WeldJoint>
+						</PinJoint>
 					</Joint>
 					<VisibleObject>
 						<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
@@ -1091,7 +1101,7 @@
 					<inertia_yz>0</inertia_yz>
 					<!--Joint that connects this body with the parent body.-->
 					<Joint>
-						<PinJoint name="knee_one">
+						<WeldJoint name="knee_one">
 							<!--Name of the parent body to which this joint connects its owner body.-->
 							<parent_body>tibia_stick</parent_body>
 							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
@@ -1104,22 +1114,12 @@
 							<orientation>0 0 0</orientation>
 							<!--Set holding the generalized coordinates (q's) that parmeterize this joint.-->
 							<CoordinateSet>
-								<objects>
-									<Coordinate name="Knee_Angle">
-										<!--Coordinate can describe rotational, translational, or coupled motion. Defaults to rotational.-->
-										<motion_type>rotational</motion_type>
-										<!--The value of this coordinate before any value has been set. Rotational coordinate value is in radians and Translational in meters.-->
-										<default_value>0</default_value>
-										<!--The minimum and maximum values that the coordinate can range between. Rotational coordinate range in radians and Translational in meters.-->
-										<range>0 2.44346095279206</range>
-										<!--Flag indicating whether or not the values of the coordinates should be prescribed according to the function above. It is ignored if the no prescribed function is specified.-->
-										<prescribed>false</prescribed>
-									</Coordinate>
-								</objects>
+								<objects />
+								<groups />
 							</CoordinateSet>
 							<!--Whether the joint transform defines parent->child or child->parent.-->
 							<reverse>false</reverse>
-						</PinJoint>
+						</WeldJoint>
 					</Joint>
 					<VisibleObject>
 						<!--Set of geometry files and associated attributes, allow .vtp, .stl, .obj-->
@@ -1239,11 +1239,11 @@
 					<Joint>
 						<WeldJoint name="knee_two">
 							<!--Name of the parent body to which this joint connects its owner body.-->
-							<parent_body>tibia_stick</parent_body>
+							<parent_body>knee_stick_y_massless</parent_body>
 							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
-							<location_in_parent>0 0.02 -0.04</location_in_parent>
+							<location_in_parent>0 0.02 0.04</location_in_parent>
 							<!--Orientation of the joint in the parent body specified in the parent reference frame. Euler XYZ body-fixed rotation angles are used to express the orientation. Default is (0,0,0).-->
-							<orientation_in_parent>0.523599 0 0.785398</orientation_in_parent>
+							<orientation_in_parent>0.523599 0 0</orientation_in_parent>
 							<!--Location of the joint in the child body specified in the child reference frame. For SIMM models, this vector is always the zero vector (i.e., the body reference frame coincides with the joint). -->
 							<location>0 0 0</location>
 							<!--Orientation of the joint in the owing body specified in the owning body reference frame.  Euler XYZ body-fixed rotation angles are used to express the orientation. -->

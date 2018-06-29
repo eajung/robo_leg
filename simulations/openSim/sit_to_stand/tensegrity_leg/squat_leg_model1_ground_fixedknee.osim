@@ -1239,11 +1239,11 @@
 					<Joint>
 						<WeldJoint name="knee_two">
 							<!--Name of the parent body to which this joint connects its owner body.-->
-							<parent_body>knee_stick_y_massless</parent_body>
+							<parent_body>tibia_stick</parent_body>
 							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
-							<location_in_parent>0 0.02 0.04</location_in_parent>
+							<location_in_parent>0 0.02 -0.04</location_in_parent>
 							<!--Orientation of the joint in the parent body specified in the parent reference frame. Euler XYZ body-fixed rotation angles are used to express the orientation. Default is (0,0,0).-->
-							<orientation_in_parent>0.523599 0 0</orientation_in_parent>
+							<orientation_in_parent>0.523599 0 0.785398</orientation_in_parent>
 							<!--Location of the joint in the child body specified in the child reference frame. For SIMM models, this vector is always the zero vector (i.e., the body reference frame coincides with the joint). -->
 							<location>0 0 0</location>
 							<!--Orientation of the joint in the owing body specified in the owning body reference frame.  Euler XYZ body-fixed rotation angles are used to express the orientation. -->

@@ -1156,7 +1156,7 @@
 						<transform> 0 0 0 0 0 0</transform>
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
-						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overridden for individual geometries-->
 						<display_preference>0</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
@@ -8267,7 +8267,7 @@
 							</objects>
 							<groups />
 						</PathPointSet>
-						<!--The wrap objecs that are associated with this path-->
+						<!--The wrap objects that are associated with this path-->
 						<PathWrapSet>
 							<objects />
 							<groups />

@@ -39,8 +39,8 @@ Adafruit_MotorShield AFMS         = Adafruit_MotorShield();
  * Select which 'port' M1, M2, M3, or M4. This is M1
  */
 //Creating instances of motor
-Adafruit_DCMotor *f_hip_motor     = AFMS.getMotor(2); //hip flex forward motor
-Adafruit_DCMotor *b_hip_motor     = AFMS.getMotor(3); //hip flex rear motor
+Adafruit_DCMotor *f_hip_motor     = AFMS.getMotor(1); //hip flex forward motor
+Adafruit_DCMotor *b_hip_motor     = AFMS.getMotor(4); //hip flex rear motor
 
 // *commenting out motor 3* Adafruit_DCMotor *hamstring_motor = AFMS.getMotor(3); //knee flex backwards motor
 
@@ -106,33 +106,37 @@ void loop() {
     commaIndex         = input.indexOf(',');
     String firstValue  = input.substring(0, commaIndex);
     String secondValue = input.substring(commaIndex+1);
-    String thirdValue = input.substring(commaIndex+2);
-
+    
     /*set the desired motor and the desired speed */
     desired_Motor      = firstValue[0];
     desired_Speed      = secondValue.toInt();
-    second_desired_Speed  = thirdValue.toInt();
+//    second_desired_Speed  = thirdValue.toInt();*/
+    //desired_Motor      = 'a';
+    //desired_Speed      = 300;
+   
 
     /*switch statement covering all hotkey cases */
     switch (desired_Motor) {
       case 'f': //HOTKEY = f, move front hip forward
         Serial.print("Move front hip forward, ");
         Serial.println(desired_Speed);
-        f_hip_motor->run(BACKWARD);
+        f_hip_motor->run(FORWARD);
         for (int i = 0; i < desired_Speed; i++) {
           f_hip_motor->setSpeed(i);
         }
         delay(5);
         break;
+        
       case 'b': //HOTKEY = b, move front hip backward
         Serial.print("Move front hip backward, ");
         Serial.println(desired_Speed);
-        f_hip_motor->run(FORWARD);
+        f_hip_motor->run(BACKWARD);
         for(int i = 0; i < desired_Speed; i++) {
           f_hip_motor->setSpeed(i);
         }
         delay(5);
         break;
+        
       case 'g': //HOTKEY = g, move rear hip forward
         Serial.print("Move back hip forward, ");
         Serial.println(desired_Speed);
@@ -142,6 +146,7 @@ void loop() {
         }
         delay(5);
         break;
+        
       case 'n': //HOTKEY = n, move rear hip backward
         Serial.print("Move back hip backward, ");
         Serial.println(desired_Speed);
@@ -149,79 +154,15 @@ void loop() {
         for(int i = 0; i < desired_Speed; i++) {
           b_hip_motor->setSpeed(i);
         }
-
-//motors move forward at different speeds
-
-        case 'a': //HOTKEY = n, move rear hip backward
-        Serial.print("Move front and back hip forwards, ");
-        Serial.println(desired_Speed);
-        Serial.println(second_desired_Speed);
-        f_hip_motor->run(FORWARD);
-        b_hip_motor->run(FORWARD);
-        for(int i = 0; i < desired_Speed; i++) {
-          f_hip_motor->setSpeed(i);
-          
-          for(int j = 0; j < second_desired_Speed; j++) {
-            b_hip_motor->setSpeed(j);
-              }
-        }
-         
-        delay(5);
-        break;
-
-       case 'i': //HOTKEY = n, move rear hip backward
-
-    //motors move backward at different speeds
-    
-        Serial.print("Move front and back hip backwards, ");
-        Serial.println(desired_Speed);
-         Serial.println(second_desired_Speed);
-        f_hip_motor->run(BACKWARD);
-        b_hip_motor->run(BACKWARD);
-        for(int i = 0; i < desired_Speed; i++) {
-          f_hip_motor->setSpeed(i);
-
-           
-          for(int j = 0; j < second_desired_Speed; j++) {
-            b_hip_motor->setSpeed(j);
-              }
-         
-        }
-
-        
-        delay(5);
-        break; 
-
-
-        case 'y': //HOTKEY = n, move rear hip backward
-        Serial.print("Move front hip forward and back hip backward , ");
-        Serial.println(desired_Speed);
-        f_hip_motor->run(FORWARD);
-        b_hip_motor->run(BACKWARD);
-        for(int i = 0; i < desired_Speed; i++) {
-          f_hip_motor->setSpeed(i);
-          b_hip_motor->setSpeed(i);
-        }
-    
-        delay(5);
-        break;
-
-       case 'z': //HOTKEY = n, move rear hip backward
        
-        Serial.print("Move front hip backward and back hip forward, ");
-        Serial.println(desired_Speed);
-        f_hip_motor->run(BACKWARD);
-        b_hip_motor->run(FORWARD);
-        for(int i = 0; i < desired_Speed; i++) {
-          f_hip_motor->setSpeed(i);
          
-        }
-
-         for(int i = 0; i < second_desired_Speed; i++) {
-          b_hip_motor->setSpeed(i);
-        }
         delay(5);
-        break; 
+        break;
+
+      
+
+
+      
         
      // case 'h': //HOTKEY = h, move hamstring forward
         //Serial.print("Move hamstring forward, ");

@@ -89,6 +89,41 @@ void loop() {
         
         delay(5);
         break;
+
+ 
+ //Both tibialis_hamstring_motor and calf_quadriceps_motor contract
+//c stands for contract
+        case 'c':
+        Serial.print(" Both tibialis_hamstring_motor and calf_quadriceps_motor contract") ;
+        Serial.println(desired_Speed);
+        tibialis_hamstring_motor->run(FORWARD);
+        calf_quadriceps_motor->run(FORWARD);
+        for (int i = 0; i < desired_Speed; i++) {
+          tibialis_hamstring_motor->setSpeed(i/4);
+           calf_quadriceps_motor->setSpeed(i);
+
+          
+        }
+
+        
+        delay(5);
+        break;
+
+   case 'r':
+        Serial.print(" Both tibialis_hamstring_motor and calf_quadriceps_motor contract") ;
+        Serial.println(desired_Speed);
+        tibialis_hamstring_motor->run(BACKWARD);
+        calf_quadriceps_motor->run(BACKWARD);
+        for (int i = 0; i < desired_Speed; i++) {
+          tibialis_hamstring_motor->setSpeed(i/2);
+           calf_quadriceps_motor->setSpeed(i);
+
+          
+        }
+
+        
+        delay(5);
+        break;     
     
     
 

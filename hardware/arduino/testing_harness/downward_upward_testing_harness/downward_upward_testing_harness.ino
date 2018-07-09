@@ -58,7 +58,7 @@ void loop() {
       case 'd':
         Serial.print("Downward Phase: Tibialis_hamstring_motor contracting while calf_quadriceps_motor releasing") ;
         Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(FORWARD);
+        tibialis_hamstring_motor->run(BACKWARD);
         calf_quadriceps_motor->run(BACKWARD);
         for (int i = 0; i < desired_Speed; i++) {
           tibialis_hamstring_motor->setSpeed(i);
@@ -77,7 +77,7 @@ void loop() {
         case 'u':
         Serial.print("Upward Phase: Tibialis_hamstring_motor releasing while calf_quadriceps_motor contracting") ;
         Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(BACKWARD);
+        tibialis_hamstring_motor->run(FORWARD);
         calf_quadriceps_motor->run(FORWARD);
         for (int i = 0; i < desired_Speed; i++) {
           tibialis_hamstring_motor->setSpeed(i/2);
@@ -96,7 +96,7 @@ void loop() {
         case 'c':
         Serial.print(" Both tibialis_hamstring_motor and calf_quadriceps_motor contract") ;
         Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(FORWARD);
+        tibialis_hamstring_motor->run(BACKWARD);
         calf_quadriceps_motor->run(FORWARD);
         for (int i = 0; i < desired_Speed; i++) {
           tibialis_hamstring_motor->setSpeed(i/4);
@@ -112,7 +112,7 @@ void loop() {
    case 'r':
         Serial.print(" Both tibialis_hamstring_motor and calf_quadriceps_motor contract") ;
         Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(BACKWARD);
+        tibialis_hamstring_motor->run(FORWARD);
         calf_quadriceps_motor->run(BACKWARD);
         for (int i = 0; i < desired_Speed; i++) {
           tibialis_hamstring_motor->setSpeed(i/2);

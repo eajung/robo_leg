@@ -38,11 +38,12 @@ void setup() {
   Serial.begin(9600); //Set the baud rate
   Serial.print("Power On. Begin Test.\n"); //Inform user that test is starting
   AFMS.begin(); //begin
+}
 
-  String input;
-  int    commaIndex;
-  char   command;
-  int    desired_Speed;
+String input;
+int    commaIndex;
+char   command;
+int    desired_Speed;
 
 void loop() {
   
@@ -71,26 +72,29 @@ void loop() {
 
     /*switch statement covering all hotkey cases */
     switch (command) {
-      case 't': //HOTKEY = t, move tibialis_hamstring_motor forward
-        Serial.print("Move tibialis_hamstring_motor forward, ");
+      
+      case 't': //HOTKEY = h, move tibialis_hamstring_motor forward and contracts
+        Serial.print("Move tibialis_hamstring_motor contracts, ");
         Serial.println(desired_Speed);
         tibialis_hamstring_motor->run(FORWARD);
-        for (int i = 0; i < desired_Speed; i++) {
-          tibialis_hamstring_motor->setSpeed(i);
-        }
-        delay(5);
-        break;
-      case 'h': //HOTKEY = h, move tibialis_hamstring_motor backward
-        Serial.print("Move tibialis_hamstring_motor backward, ");
-        Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(BACKWARD);
         for(int i = 0; i < desired_Speed; i++) {
           tibialis_hamstring_motor->setSpeed(i);
         }
         delay(5);
         break;
-      case 'c': //HOTKEY = c, move calf_quadricep_motor forward
-        Serial.print("Move calf_quadricep_motor forward, ");
+        
+      case 'h': //HOTKEY = t, move tibialis_hamstring_motor backward and releases
+        Serial.print("Move tibialis_hamstring_motor releases, ");
+        Serial.println(desired_Speed);
+        tibialis_hamstring_motor->run(BACKWARD);
+        for (int i = 0; i < desired_Speed; i++) {
+          tibialis_hamstring_motor->setSpeed(i);
+        }
+        delay(5);
+        break;
+        
+        case 'c': //HOTKEY = q, move calf_quadricep_motor forward
+        Serial.print("Move calf_quadricep_motor forward ");
         Serial.println(desired_Speed);
         calf_quadricep_motor->run(FORWARD);
         for(int i = 0; i < desired_Speed; i++) {
@@ -98,8 +102,9 @@ void loop() {
         }
         delay(5);
         break;
-      case 'q': //HOTKEY = q, move calf_quadricep_motor backward
-        Serial.print("Move calf_quadricep_motor backward ");
+        
+      case 'q': //HOTKEY = c, move calf_quadricep_motor backward
+        Serial.print("Move calf_quadricep_motor backward, ");
         Serial.println(desired_Speed);
         calf_quadricep_motor->run(BACKWARD);
         for(int i = 0; i < desired_Speed; i++) {
@@ -107,8 +112,9 @@ void loop() {
         }
         delay(5);
         break;
-      case 'f': //HOTKEY = f, move tibialis_hamstring_motor forward and calf_quadricep_motor forward
-        Serial.print("Move both tibialis_hamstring_motor forward and calf_quadricep_motor forward ");
+    
+      case 'f': //HOTKEY = f, move tibialis_hamstring_motor forward and calf_quadricep_motor forward - contracts
+        Serial.print("both tibialis_hamstring_motor and calf_quadricep_motor contracts ");
         Serial.println(desired_Speed);
         tibialis_hamstring_motor->run(FORWARD);
         calf_quadricep_motor->run(FORWARD);
@@ -118,8 +124,8 @@ void loop() {
         }
         delay(5);
         break;
-      case 'b': //HOTKEY = b, move tibialis_hamstring_motor backward and calf_quadricep_motor backward
-        Serial.print("Move both tibialis_hamstring_motor backward and calf_quadricep_motor backward");
+      case 'b': //HOTKEY = b, move tibialis_hamstring_motor backward and calf_quadricep_motor backward - releases
+        Serial.print("Both tibialis_hamstring_motor and calf_quadricep_motor releases ");
         Serial.println(desired_Speed);
         tibialis_hamstring_motor->run(BACKWARD);
         calf_quadricep_motor->run(BACKWARD);
@@ -130,8 +136,8 @@ void loop() {
         delay(5);
         break;
 
-      case 'a': //HOTKEY = i, move tibialis_hamstring_motor forward and calf_quadricep_motor backward
-        Serial.print("Move tibialis_hamstring_motor forward and calf_quadricep_motor backward");
+      case 'a': //HOTKEY = i, move tibialis_hamstring_motor forward (contract) and calf_quadricep_motor backward (release)
+        Serial.print(" tibialis_hamstring_motor contracts and calf_quadricep_motor releases ");
         Serial.println(desired_Speed);
         tibialis_hamstring_motor->run(FORWARD);
         calf_quadricep_motor->run(BACKWARD);
@@ -141,8 +147,8 @@ void loop() {
         }
         delay(5);
         break;
-      case 'o': //HOTKEY = o, move tibialis_hamstring_motor backward and calf_quadricep_motor forward
-        Serial.print("Move tibialis_hamstring_motor backward and calf_quadricep_motor forward");
+      case 'o': //HOTKEY = o, move tibialis_hamstring_motor backward (release) and calf_quadricep_motor forward (contract)
+        Serial.print("tibialis_hamstring_motor releases and calf_quadricep_motor contracts ");
         Serial.println(desired_Speed);
         tibialis_hamstring_motor->run(BACKWARD);
         calf_quadricep_motor->run(FORWARD);
@@ -164,5 +170,8 @@ void loop() {
         delay(5);
         break;
         
-      
+    }     
 }
+
+}
+  

@@ -2,22 +2,8 @@
   REV_5_open_loop.ino
   
   Description:
-  This program is for testing the motors on the tensegrity flexural joint by individually controlling every motor
-  With different hotkeys. Moreover, each motor can be set at a particular speed. Note that there is a small delay
-  with pressing return in the Serial TX side and the motors following through.
-
-  The format for the transmission is as follows:
-  desired_Motor,speed with NO spaces!
-
-  The hotkeys for the motors are as follows:
-  t: tibialis_hamstring_motor forward
-  h: tibialis_hamstring_
-  c: calf_quadricep_motor forward
-
-  The speeds for the motors can range from 0 to 255.
-
-  Lastly, the s hotkey at any point will cease all motor activity
-  and the a hotkey will print out the current gyro reading.
+ The primary purpose of this file is that we created two helper functions - squat and stand. We have cases which are controlled by keyboard input
+ which call on these helper functions. 
 */
 
 /*
@@ -58,11 +44,12 @@ Adafruit_DCMotor *calf_quadricep_motor = AFMS.getMotor(4); // calf & quadricep m
 */
 void squat(int millisec, int desired_speed) {
   Serial.print("calf_quadricep_motor and tibialis_hamstring_motor contracts/n ");
+  // Step 1: Contracting calf and quadricep motors
   calf_quadricep_motor->run(CONTRACT_CALF); // set motor direction to contract the calf muscles
   for (int i = 0; i < desired_speed; i++) calf_quadricep_motor->setSpeed(i); // contract the muscles at desired speed
   delay(millisec); // motion limited by amount of time
   for (int i = 0; i < desired_speed; i++) calf_quadricep_motor->setSpeed(0); // stops the contraction of the muscles at desired speed
-
+  // Step 2: Contracting tibialis and hamstring motors
   tibialis_hamstring_motor ->run(CONTRACT_TIBIALIS); // set motor direction to contract the tibialis muscles
   for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(i); // contract the muscles at desired speed
   delay(millisec / 2); // motion limited by amount of time

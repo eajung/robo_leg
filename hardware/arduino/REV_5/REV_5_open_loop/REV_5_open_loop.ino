@@ -26,6 +26,19 @@
 #include <Wire.h>
 #include "Timer.h"
 
+/*
+   macro definitions and global variables
+*/
+#define RELEASE_TIBIALIS 1
+#define CONTRACT_TIBIALIS 2
+#define RELEASE_CALF 2
+#define CONTRACT_CALF 1
+
+String input;
+int    commaIndex;
+char   command;
+int    desired_speed;
+Timer t;
 
 Adafruit_MotorShield AFMS         = Adafruit_MotorShield();
 /*
@@ -35,6 +48,7 @@ Adafruit_MotorShield AFMS         = Adafruit_MotorShield();
 Adafruit_DCMotor *tibialis_hamstring_motor     = AFMS.getMotor(1); //hip flex forward motor
 Adafruit_DCMotor *calf_quadricep_motor     = AFMS.getMotor(4); //hip flex rear motor
 
+
 /*
     HELPER FUNCTIONS
 */
@@ -43,8 +57,50 @@ Adafruit_DCMotor *calf_quadricep_motor     = AFMS.getMotor(4); //hip flex rear m
 //       int desired_speed - moves the motors at this desired_speed to move the tensigrity structure
 //Description: This function will have both tibialis_hamstring_motor and the calf_quadricep_motor contract but one will contract at a slower rate in that amount of time.
 void squat(int millisec, int desired_speed) {
-  Serial.print("Move calf_quadricep_motor contracts/n ");
-  calf_quadricep_motor->run(FORWARD);
+  Serial.print("calf_quadricep_motor and tibialis_hamstring_motor contracts/n ");
+
+  calf_quadricep_motor->run(RELEASE_CALF);
+  for (int i = 0; i < desired_speed; i++) {
+    calf_quadricep_motor->setSpeed(i);
+  }
+  delay(millisec);
+  for (int i = 0; i < desired_speed; i++) {
+    calf_quadricep_motor->setSpeed(0);
+
+  }
+
+  tibialis_hamstring_motor ->run(CONTRACT_TIBIALIS);
+  for (int i = 0; i < desired_speed; i++) {
+    tibialis_hamstring_motor ->setSpeed(i);
+  }
+  delay(millisec / 2);
+  for (int i = 0; i < desired_speed; i++) {
+    tibialis_hamstring_motor ->setSpeed(0);
+  }
+
+
+
+
+
+}
+
+
+//stand():
+//param: int millisec - specifies the amount of time tensegrity structure has to stand up
+//       int desired_speed - the motors at this desired_speed make the tensegrity structure stand up
+//Description: This function will have both tibialis_hamstring_motor and the calf_quadricep_motor release but one will release at a slower rate in that amount of time.
+void stand(int millisec, int desired_speed) {
+
+  tibialis_hamstring_motor ->run(RELEASE_TIBIALIS);
+  for (int i = 0; i < desired_speed; i++) {
+    tibialis_hamstring_motor ->setSpeed(i);
+  }
+  delay(millisec / 2);
+  for (int i = 0; i < desired_speed; i++) {
+    tibialis_hamstring_motor ->setSpeed(0);
+  }
+
+  calf_quadricep_motor->run(CONTRACT_CALF);
   for (int i = 0; i < desired_speed; i++) {
     calf_quadricep_motor->setSpeed(i);
   }
@@ -52,19 +108,22 @@ void squat(int millisec, int desired_speed) {
   for (int i = 0; i < desired_speed; i++) {
     calf_quadricep_motor->setSpeed(0);
   }
+
+
+
+
+  //
+
+
+
 }
+
 
 void setup() {
   Serial.begin(9600); //Set the baud rate
   Serial.print("Power On. Begin Test.\n"); //Inform user that test is starting
   AFMS.begin(); //begin
 }
-
-String input;
-int    commaIndex;
-char   command;
-int    desired_speed;
-Timer t;
 
 void loop() {
 
@@ -94,7 +153,8 @@ void loop() {
     /*switch statement covering all hotkey cases */
     switch (command) {
       case 's': //HoTEKEY = s, starts the squat
-        squat(4000, 80);
+        squat(4000, 90);
+        stand(3000, 90);
         break;
 
 

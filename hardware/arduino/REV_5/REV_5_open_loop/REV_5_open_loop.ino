@@ -50,10 +50,21 @@ void squat(int millisec, int desired_speed) {
   delay(millisec); // motion limited by amount of time
   for (int i = 0; i < desired_speed; i++) calf_quadricep_motor->setSpeed(0); // stops the contraction of the muscles at desired speed
   // Step 2: Contracting tibialis and hamstring motors
-  tibialis_hamstring_motor ->run(CONTRACT_TIBIALIS); // set motor direction to contract the tibialis muscles
+  tibialis_hamstring_motor ->run(RELEASE_TIBIALIS); // set motor direction to contract the tibialis muscles
   for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(i); // contract the muscles at desired speed
-  delay(millisec / 2); // motion limited by amount of time
+  delay(millisec / 3); // motion limited by amount of time
   for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(0); // stops the contraction of the muscles at desired speed
+  // Step 3: Contracting tibialis and hamstring motors
+//  tibialis_hamstring_motor ->run(CONTRACT_TIBIALIS); // set motor direction to contract the tibialis muscles
+//  for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(i); // contract the muscles at desired speed
+//  delay(millisec / 3); // motion limited by amount of time
+//  for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(0); // stops the contraction of the muscles at desired speed
+//   // Step 4: Releasing calf and quadricep motors
+//  calf_quadricep_motor->run(RELEASE_CALF); // set motor direction to contract the calf muscles
+//  for (int i = 0; i < desired_speed; i++) calf_quadricep_motor->setSpeed(i); // contract the muscles at desired speed
+//  delay(millisec/2); // motion limited by amount of time
+//  for (int i = 0; i < desired_speed; i++) calf_quadricep_motor->setSpeed(0); // stops the contraction of the muscles at desired speed
+  
 }
 
 /*
@@ -64,16 +75,17 @@ void squat(int millisec, int desired_speed) {
 */
 void stand(int millisec, int desired_speed) {
   Serial.print("calf_quadricep_motor and tibialis_hamstring_motor releasing/n ");
-  // Step 1: Releasing tibialis and hamstring motors
-  tibialis_hamstring_motor ->run(RELEASE_TIBIALIS); // set motor direction to contract the calf muscles
-  for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(i); // contract the muscles at desired speed
-  delay(millisec / 2); // motion limited by amount of time
-  for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(0); // stops the contractions of the muscles at desired speed
-  // Step 2: Releasing calf and quadricep motors
+  // Step 1: Releasing calf and quadricep motors
   calf_quadricep_motor->run(RELEASE_CALF); // set motor direction to contract the tibialis muscles
   for (int i = 0; i < desired_speed; i++) calf_quadricep_motor->setSpeed(i); // contract the muscles at desired speed
-  delay(millisec); // motion limited by amount of time
+  delay(millisec/2); // motion limited by amount of time
   for (int i = 0; i < desired_speed; i++) calf_quadricep_motor->setSpeed(0); // stops the contractions of the muscles at desired speed
+  // Step 2: Releasing tibialis and hamstring motors
+  tibialis_hamstring_motor ->run(CONTRACT_TIBIALIS); // set motor direction to contract the calf muscles
+  for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(i); // contract the muscles at desired speed
+  delay(millisec / 3); // motion limited by amount of time
+  for (int i = 0; i < desired_speed; i++) tibialis_hamstring_motor ->setSpeed(0); // stops the contractions of the muscles at desired speed
+  
 }
 
 // ================== SETUP FUNCTION ===========================
@@ -104,8 +116,8 @@ void loop() {
     /*switch statement covering all hotkey cases */
     switch (command) {
       case 's': //HOTKEY = s, starts the squat
-        squat(4000, 90); // calls squat(int millisec, int desired_speed)
-        stand(3000, 90); // calls stand(int millisec, int desired_speed)
+        squat(4200, 90); // calls squat(int millisec, int desired_speed)
+        stand(3500, 90); // calls stand(int millisec, int desired_speed)
         break;
       case 'x': //HOTKEY = x, stop all motor activity
         Serial.print("Stop: ");

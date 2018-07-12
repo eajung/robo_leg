@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <OpenSimDocument Version="30000">
-<!--		<xs:element name="scale_factor" type="xs:decimal"/>
-		<scale_factor>1</scale_factor> -->
 	<Model name="model1_grounded">
-
 		<credits>Erik Jung, Lawrence Ngo, Nicholas Cessna, Chris Cheney, Adam Buderi.</credits>
 		<length_units>meters</length_units>
 		<force_units>N</force_units>
 		<!--Acceleration due to gravity.-->
 		<gravity> 0 -9.80665 0</gravity>
-		<xs:element name="scale_variable" type="xs:decimal"/>
-		<scale_variable>0.25</scale_variable>
 		<!--Bodies in the model.-->
 		<BodySet>
 			<objects>
@@ -39,7 +34,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>0</display_preference>
+									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -658,7 +653,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>0</display_preference>
+									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -672,7 +667,7 @@
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
 						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-						<display_preference>0</display_preference>
+						<display_preference>4</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -1100,7 +1095,7 @@
 							<!--Name of the parent body to which this joint connects its owner body.-->
 							<parent_body>tibia_stick</parent_body>
 							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
-							<location_in_parent>0 0.30 0</location_in_parent>
+							<location_in_parent>0 0.3 0</location_in_parent>
 							<!--Orientation of the joint in the parent body specified in the parent reference frame. Euler XYZ body-fixed rotation angles are used to express the orientation. Default is (0,0,0).-->
 							<orientation_in_parent>0 -1.5708 0</orientation_in_parent>
 							<!--Location of the joint in the child body specified in the child reference frame. For SIMM models, this vector is always the zero vector (i.e., the body reference frame coincides with the joint). -->
@@ -1143,7 +1138,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>0</display_preference>
+									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -1156,8 +1151,8 @@
 						<transform> 0 0 0 0 0 0</transform>
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
-						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overridden for individual geometries-->
-						<display_preference>0</display_preference>
+						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
+						<display_preference>4</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -1342,8 +1337,6 @@
 									<color> 0.4 0.4 0.4</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
-									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
-									<result><scale_factors><xsl:value-of select="$scale_variable"/> <xsl:value-of select="$scale_variable"/> <xsl:value-of select="$scale_variable"/></scale_factors></result>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
 									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
@@ -1424,7 +1417,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>0</display_preference>
+									<display_preference>4</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -1438,7 +1431,7 @@
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
 						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-						<display_preference>0</display_preference>
+						<display_preference>4</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -1732,7 +1725,7 @@
 							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
 							<location_in_parent>0 0 0</location_in_parent>
 							<!--Orientation of the joint in the parent body specified in the parent reference frame. Euler XYZ body-fixed rotation angles are used to express the orientation. Default is (0,0,0).-->
-							<orientation_in_parent>-1.578 0 0 </orientation_in_parent>
+							<orientation_in_parent>-1.578 0 0</orientation_in_parent>
 							<!--Location of the joint in the child body specified in the child reference frame. For SIMM models, this vector is always the zero vector (i.e., the body reference frame coincides with the joint). -->
 							<location>0 0 0</location>
 							<!--Orientation of the joint in the owing body specified in the owning body reference frame.  Euler XYZ body-fixed rotation angles are used to express the orientation. -->
@@ -1797,7 +1790,6 @@
 							<parent_body>steel_beam_ground</parent_body>
 							<!--Location of the joint in the parent body specified in the parent reference frame. Default is (0,0,0).-->
 							<location_in_parent>0 0 0.12</location_in_parent>
-							<!--0 0 -0.15-->
 							<!--Orientation of the joint in the parent body specified in the parent reference frame. Euler XYZ body-fixed rotation angles are used to express the orientation. Default is (0,0,0).-->
 							<orientation_in_parent>-1.578 -1.578 3.156</orientation_in_parent>
 							<!--Location of the joint in the child body specified in the child reference frame. For SIMM models, this vector is always the zero vector (i.e., the body reference frame coincides with the joint). -->
@@ -2537,7 +2529,7 @@
 								</PathPoint>
 								<PathPoint name="low_knee-P2">
 									<location> 0 0.07 0</location>
-				<body>knee_stick_y_one</body>
+									<body>knee_stick_y_one</body>
 								</PathPoint>
 							</objects>
 							<groups />
@@ -3202,7 +3194,7 @@
 									<body>knee_stick_one</body>
 								</PathPoint>
 								<PathPoint name="tibialis-P2">
-									<location> 0 -0.20 0</location>
+									<location> 0 -0.2 0</location>
 									<body>steel_beam_ground</body>
 								</PathPoint>
 							</objects>
@@ -3424,7 +3416,7 @@
 									<body>knee_stick_two</body>
 								</PathPoint>
 								<PathPoint name="calf_muscle-1-P2">
-									<location> 0 0.20 0</location>
+									<location> 0 0.2 0</location>
 									<body>steel_beam_ground</body>
 								</PathPoint>
 							</objects>
@@ -3498,7 +3490,7 @@
 									<body>knee_stick_three</body>
 								</PathPoint>
 								<PathPoint name="calf_muscle-2-P2">
-									<location> 0 0.20 0</location>
+									<location> 0 0.2 0</location>
 									<body>steel_beam_ground</body>
 								</PathPoint>
 							</objects>
@@ -3629,7 +3621,6 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				
 				<Thelen2003Muscle name="knee_two_to_hip_two">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>false</isDisabled>
@@ -3777,7 +3768,7 @@
 					<Af>0.3</Af>
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
-				</Thelen2003Muscle>				
+				</Thelen2003Muscle>
 				<Thelen2003Muscle name="knee_two_to_tibia">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>true</isDisabled>
@@ -4074,7 +4065,6 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				
 				<Thelen2003Muscle name="psoas_cable_one">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>true</isDisabled>
@@ -4223,7 +4213,6 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				
 				<Thelen2003Muscle name="semimembranosus_cable_one">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>true</isDisabled>
@@ -6074,7 +6063,6 @@
 					<!--maximum normalized lengthening force-->
 					<Flen>1.8</Flen>
 				</Thelen2003Muscle>
-				
 				<Ligament name="quad_cable_one_ligament">
 					<!--Flag indicating whether the force is disabled or not. Disabled means that the force is not active in subsequent dynamics realizations.-->
 					<isDisabled>false</isDisabled>
@@ -8267,7 +8255,7 @@
 							</objects>
 							<groups />
 						</PathPointSet>
-						<!--The wrap objects that are associated with this path-->
+						<!--The wrap objecs that are associated with this path-->
 						<PathWrapSet>
 							<objects />
 							<groups />
@@ -8314,8 +8302,8 @@
 									<body>ankle_bottom_one</body>
 								</PathPoint>
 								<PathPoint name="ankle_bottom_one_ground_to_tibia-P2">
-									<body>femur_stick</body>
 									<location> 0 -0.24 0</location>
+									<body>femur_stick</body>
 								</PathPoint>
 							</objects>
 							<groups />
@@ -8354,7 +8342,6 @@
 						<y> 0 0 0 0 0.00083333 0.00333333 0.0075 0.0133333 0.0208333 0.03 0.04 0.07 0.1 0.12 0.17 0.37 0.67 0.97</y>
 					</SimmSpline>
 				</Ligament>
-				
 			</objects>
 			<groups />
 		</ForceSet>

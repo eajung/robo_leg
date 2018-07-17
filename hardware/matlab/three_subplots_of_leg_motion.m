@@ -39,7 +39,7 @@ while(current_frame < end_frame)
         plot([ankle_1(1) ankle_2(1)], [ankle_1(2) ankle_2(2)])
         hold off
         axis([0 0.22 0 1.6])
-        title('Start of Squat')
+        title({'Start of Squat', 'Time: 0.0 seconds'} )
         xlabel('x(m)') % x-axis label
         ylabel('y(m)') % y-axis label
     end
@@ -65,7 +65,7 @@ while(current_frame < end_frame)
         plot([ankle_1(1) ankle_2(1)], [ankle_1(2) ankle_2(2)])
         hold off
         axis([0 0.22 0 1.6])
-        title('End of Squat')
+        title({'End of Squat', 'Time: 0.0 - 4.491 seconds'})
         xlabel('x(m)') % x-axis label
         ylabel('y(m)') % y-axis label
     end
@@ -91,7 +91,7 @@ while(current_frame < end_frame)
         plot([ankle_1(1) ankle_2(1)], [ankle_1(2) ankle_2(2)])
         hold off
         axis([0 0.22 0 1.6])
-        title('End of Stand')
+        title({'End of Stand', 'Time: 4.491 - 7.983 seconds'})
         xlabel('x(m)') % x-axis label
         ylabel('y(m)') % y-axis label
         

@@ -23,7 +23,7 @@
 #define TIBIALIS_PWM 15
 #define CALF_POSITIVE 12
 #define CALF_NEGATIVE 13
-#define CALF_PWM 2
+#define CALF_PWM 23
 
 WiFiUDP udp; // make a variable instance of the WiFiUDP
 const char *ssid = "REV 5 Tensegrity"; // WiFi network
@@ -45,15 +45,15 @@ long count = 0;
   Description: This function will have both tibialis_hamstring_motor and the calf_quadricep_motor contract but one will contract at a slower rate in that amount of time.
 */
 void squat(int millisec, int desired_speed) {
-  Serial.print("calf_quadricep_motor and tibialis_hamstring_motor contracts\n ");
-  // Step 1: Contracting calf and quadricep motors
+  Serial.println("SQUAT: calf_quadricep_motor and tibialis_hamstring_motor contracts");
+  Serial.println("Step 1: Contracting calf and quadricep motors");
   // set motor direction to contract the calf muscles
   digitalWrite(CALF_POSITIVE, LOW);
   digitalWrite(CALF_NEGATIVE, HIGH);
   for (int i = 0; i < desired_speed; i++) analogWrite(CALF_PWM, i);  // contract the muscles at desired speed
   delay(millisec); // motion limited by amount of time
   for (int i = 0; i < desired_speed; i++) analogWrite(CALF_PWM, 0); // stops the contraction of the muscles at desired speed
-  // Step 2: Contracting tibialis and hamstring motors
+  Serial.println("Step 2: Contracting tibialis and hamstring motors");
   // set motor direction to contract the tibialis muscles
   digitalWrite(TIBIALIS_POSITIVE, HIGH);
   digitalWrite(TIBIALIS_NEGATIVE, LOW);
@@ -69,21 +69,22 @@ void squat(int millisec, int desired_speed) {
   Description: This function will have both tibialis_hamstring_motor and the calf_quadricep_motor release but one will release at a slower rate in that amount of time.
 */
 void stand(int millisec, int desired_speed) {
-  Serial.print("calf_quadricep_motor and tibialis_hamstring_motor releasing\n ");
-  // Step 1: Releasing calf and quadricep motors
+  Serial.println("STAND: calf_quadricep_motor and tibialis_hamstring_motor releasing");
+  Serial.println("Step 1: Releasing calf and quadricep motors");
   // set motor direction to contract the tibialis muscles
   digitalWrite(CALF_POSITIVE, HIGH);
   digitalWrite(CALF_NEGATIVE, LOW);
   for (int i = 0; i < desired_speed; i++) analogWrite(CALF_PWM, i); // contract the muscles at desired speed
   delay(millisec/2); // motion limited by amount of time
   for (int i = 0; i < desired_speed; i++) analogWrite(CALF_PWM, 0); // stops the contractions of the muscles at desired speed
-  // Step 2: Releasing tibialis and hamstring motors
+  Serial.println("Step 2: Releasing tibialis and hamstring motors");
   // set motor direction to contract the calf muscles
   digitalWrite(TIBIALIS_POSITIVE, LOW);
   digitalWrite(TIBIALIS_NEGATIVE, HIGH);
   for (int i = 0; i < desired_speed; i++) analogWrite(TIBIALIS_PWM, i); // contract the muscles at desired speed
   delay(millisec / 3); // motion limited by amount of time
-  for (int i = 0; i < desired_speed; i++) analogWrite(TIBIALIS_PWM, 0); // stops the contractions of the muscles at desired speed  
+  for (int i = 0; i < desired_speed; i++) analogWrite(TIBIALIS_PWM, 0); // stops the contractions of the muscles at desired speed
+  Serial.println("Finished Squat.");
 }
 
 /*
@@ -91,10 +92,14 @@ void stand(int millisec, int desired_speed) {
   Description: This function will have both tibialis_hamstring_motor and the calf_quadricep_motor stop any motion.
 */
 void stop() {
-  Serial.print("calf_quadricep_motor and tibialis_hamstring_motor stop moving\n ");
+  Serial.print("STOP: calf_quadricep_motor and tibialis_hamstring_motor stop moving\n ");
   // Stop calf and quadricep motors
-  analogWrite(CALF_PWM, 0);
   analogWrite(TIBIALIS_PWM, 0);
+  analogWrite(CALF_PWM, 0);
+  digitalWrite(TIBIALIS_POSITIVE, LOW);
+  digitalWrite(TIBIALIS_NEGATIVE, LOW);
+  digitalWrite(CALF_POSITIVE, LOW);
+  digitalWrite(CALF_NEGATIVE, LOW);
 }
 
 // ================== SETUP FUNCTION ===========================
@@ -112,7 +117,12 @@ void setup() {
   pinMode(TIBIALIS_NEGATIVE, OUTPUT);
   pinMode(CALF_POSITIVE, OUTPUT);
   pinMode(CALF_NEGATIVE, OUTPUT);
+  pinMode(TIBIALIS_PWM, OUTPUT);
+  pinMode(CALF_PWM, OUTPUT);
+
   // Set the DC motor pins to low/off
+  analogWrite(TIBIALIS_PWM, 0);
+  analogWrite(CALF_PWM, 0);
   digitalWrite(TIBIALIS_POSITIVE, LOW);
   digitalWrite(TIBIALIS_NEGATIVE, LOW);
   digitalWrite(CALF_POSITIVE, LOW);
@@ -139,6 +149,7 @@ void loop() {
       case 's': //HOTKEY = s, starts the squat
         squat(4200, 90); // calls squat(int millisec, int desired_speed)
         stand(3500, 90); // calls stand(int millisec, int desired_speed)
+        stop();
         // incoming_packet[0] = NULL; // reset
         serial_ready = false;
         break;

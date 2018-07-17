@@ -9,7 +9,7 @@ close all
 clear all
 clc
 
-A = csvread('REV5_squat.csv', 5);
+A = csvread('../../../MATLAB/OptiTrack_Data/Data/REV5_squat.csv', 5);
 
 current_frame = 1;
 start_frame = 192;

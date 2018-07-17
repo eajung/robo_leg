@@ -2,7 +2,7 @@ close all
 clear all
 clc
 
-A = csvread('REV5_squat.csv', 5);
+A = csvread('../../../MATLAB/OptiTrack_Data/Data/REV5_squat.csv', 5);
 
 step_size = 50;
 indexing_frame = 192;

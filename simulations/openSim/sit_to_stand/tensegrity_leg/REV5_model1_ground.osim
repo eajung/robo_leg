@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- NOTE about squat motion: after guessing and checking, decided that the maximum angles we need for each joint are:
-	hip joint: ~45 degrees
-	knee joint:  ~86.5 degrees
-	ankle joint: ~41.176 degrees
-	maybe we can create a motion by making the change in each joint angle the same? -->
 <OpenSimDocument Version="30000">
 	<Model name="model1_ground_fixedknee">
 		<credits>Erik Jung, Lawrence Ngo, Nicholas Cessna, Chris Cheney, Adam Buderi.</credits>
@@ -293,7 +288,7 @@
 										<!--The value of this coordinate before any value has been set. Rotational coordinate value is in radians and Translational in meters.-->
 										<default_value>0</default_value>
 										<!--The minimum and maximum values that the coordinate can range between. Rotational coordinate range in radians and Translational in meters.-->
-										<range>0 2.44346095279206</range>
+										<range>-0.87266462599 0.87266462599</range>
 										<!--Flag indicating whether or not the values of the coordinates should be prescribed according to the function above. It is ignored if the no prescribed function is specified.-->
 										<prescribed>false</prescribed>
 									</Coordinate>
@@ -513,7 +508,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 1 1 1</color>
+									<color> 1 0.6 0</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
@@ -581,7 +576,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 1 1 1</color>
+									<color> 1 0.6 0</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
@@ -657,7 +652,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>4</display_preference>
+									<display_preference>0</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -671,7 +666,7 @@
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
 						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-						<display_preference>4</display_preference>
+						<display_preference>0</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -785,7 +780,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 1 1 1</color>
+									<color> 1 0.6 0</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
@@ -1065,7 +1060,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 1 1 1</color>
+									<color> 1 0.6 0</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
@@ -1133,7 +1128,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 1 1 1</color>
+									<color> 0.4 0.4 0.4</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
@@ -1141,7 +1136,7 @@
 									<!--Three scale factors for display purposes: scaleX scaleY scaleZ-->
 									<scale_factors> 1 1 1</scale_factors>
 									<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded-->
-									<display_preference>4</display_preference>
+									<display_preference>0</display_preference>
 									<!--Display opacity between 0.0 and 1.0-->
 									<opacity>1</opacity>
 								</DisplayGeometry>
@@ -1155,7 +1150,7 @@
 						<!--Whether to show a coordinate frame-->
 						<show_axes>false</show_axes>
 						<!--Display Pref. 0:Hide 1:Wire 3:Flat 4:Shaded Can be overriden for individual geometries-->
-						<display_preference>4</display_preference>
+						<display_preference>0</display_preference>
 					</VisibleObject>
 					<WrapObjectSet>
 						<objects />
@@ -1269,7 +1264,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 0.4 0.4 0.4</color>
+									<color> 1 0.6 0</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
@@ -1412,7 +1407,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 1 1 1</color>
+									<color> 0.4 0.4 0.4</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
@@ -2018,7 +2013,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 1 1 1</color>
+									<color> 1 0.6 0</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->
@@ -2086,7 +2081,7 @@
 									<!--Name of geometry file .vtp, .stl, .obj-->
 									<geometry_file>cylinder.vtp</geometry_file>
 									<!--Color used to display the geometry when visible-->
-									<color> 1 1 1</color>
+									<color> 1 0.6 0</color>
 									<!--Name of texture file .jpg, .bmp-->
 									<texture_file />
 									<!--in body transform specified as 3 rotations (rad) followed by 3 translations rX rY rZ tx ty tz-->

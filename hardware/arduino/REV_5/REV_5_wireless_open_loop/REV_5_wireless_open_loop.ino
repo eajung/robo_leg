@@ -26,6 +26,12 @@
 #define CALF_POSITIVE 12
 #define CALF_NEGATIVE 13
 #define CALF_PWM 23
+#define RELEASE_ANKLE 1
+#define CONTRACT_ANKLE 2
+#define ANKLE_POSITIVE V+
+#define ANKLE_NEGATIVE EN
+#define ANKLE_PWM 75
+
 
 WiFiUDP udp; // make a variable instance of the WiFiUDP
 const char *ssid = "REV 5 Tensegrity"; // WiFi network
@@ -155,6 +161,7 @@ void loop() {
         // incoming_packet[0] = NULL; // reset
         serial_ready = false;
         break;
+        
       case 'x': //HOTKEY = x, stop all motor activity
         stop();
         delay(5);
@@ -169,9 +176,11 @@ void loop() {
         Serial.print("Move tibialis_hamstring_motor contracts: ");
         Serial.println(millis());
         //Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(CONTRACT_TIBIALIS);
-        for (int i = 0; i < desired_Speed; i++) {
-          tibialis_hamstring_motor->setSpeed(i);
+
+        digitalWrite(TIBIALIS_POSITIVE, HIGH);
+        digitalWrite(TIBIALIS_NEGATIVE, LOW);
+        for (int i = 0; i < desired_speed; i++) analogWrite(TIBIALIS_PWM, i); // contract the muscles at desired speed
+        delay(millisec / 3); // motion limited by amount of time
         }
         delay(5);
         break;
@@ -179,85 +188,100 @@ void loop() {
       case 'h': //HOTKEY = h, move tibialis_hamstring_motor forward and releases
         Serial.print("Move tibialis_hamstring_motor releases: ");
         Serial.println(millis());
-       // Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(RELEASE_TIBIALIS);
-        for (int i = 0; i < desired_Speed; i++) {
-          tibialis_hamstring_motor->setSpeed(i);
-        }
+        digitalWrite(TIBIALIS_POSITIVE, LOW);
+        digitalWrite(TIBIALIS_NEGATIVE, HIGH);
+        for (int i = 0; i < desired_speed; i++) analogWrite(TIBIALIS_PWM, i); // contract the muscles at desired speed
         delay(5);
         break;
 
       case 'c': //HOTKEY = c, move calf_quadricep_motor forward (contract)
         Serial.print("Move calf_quadricep_motor contracts: ");
         Serial.println(millis());
-        //Serial.println(desired_Speed);
-        calf_quadricep_motor->run(CONTRACT_CALF);
-        for (int i = 0; i < desired_Speed; i++) {
-          calf_quadricep_motor->setSpeed(i);
-        }
+        digitalWrite(CALF_POSITIVE, LOW);
+        digitalWrite(CALF_NEGATIVE, HIGH);
+        for (int i = 0; i < desired_speed; i++) analogWrite(CALF_PWM, i); 
         delay(5);
         break;
 
       case 'q': //HOTKEY = q, move calf_quadricep_motor backward (releases)
         Serial.print("Move calf_quadricep_motor releases: ");
-         Serial.println(millis());
-       // Serial.println(desired_Speed);
-        calf_quadricep_motor->run(RELEASE_CALF);
-        for (int i = 0; i < desired_Speed; i++) {
-          calf_quadricep_motor->setSpeed(i);
+        Serial.println(millis());
+        digitalWrite(CALF_POSITIVE, HIGH);
+        digitalWrite(CALF_NEGATIVE, LOW);
+        for (int i = 0; i < desired_speed; i++) analogWrite(CALF_PWM, i);
+        delay(5);
+        break;
+
+      case 'q': //HOTKEY = t, ankle_motor contracts
+        Serial.print("Ankle contracts: ");
+        Serial.println(millis());
+        //Serial.println(desired_Speed);
+
+        digitalWrite(ANKLE_POSITIVE, HIGH);
+        digitalWrite(ANKLE_NEGATIVE, LOW);
+        for (int i = 0; i < desired_speed; i++) analogWrite(ANKLE_PWM, i); // contract the muscles at desired speed
         }
         delay(5);
         break;
 
-      case 'f': //HOTKEY = f, move tibialis_hamstring_motor backward and calf_quadricep_motor forward - contracts
-        Serial.print("both tibialis_hamstring_motor and calf_quadricep_motor contracts: ");
-         Serial.println(millis());
-        //Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(CONTRACT_TIBIALIS);
-        calf_quadricep_motor->run(CONTRACT_CALF);
-        for (int i = 0; i < desired_Speed; i++) {
-          tibialis_hamstring_motor->setSpeed(i);
-          calf_quadricep_motor->setSpeed(i / 2);
-        }
-        delay(5);
-        break;
-      case 'b': //HOTKEY = b, move tibialis_hamstring_motor forward and calf_quadricep_motor backward - releases
-        Serial.print("Both tibialis_hamstring_motor and calf_quadricep_motor releases: ");
-         Serial.println(millis());
-        //Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(RELEASE_TIBIALIS);
-        calf_quadricep_motor->run(RELEASE_CALF);
-        for (int i = 0; i < desired_Speed; i++) {
-          tibialis_hamstring_motor->setSpeed(i / 2);
-          calf_quadricep_motor->setSpeed(i);
-        }
-        delay(5);
-        break;
-
-      case 'a': //HOTKEY = i, move tibialis_hamstring_motor backward (contract) and calf_quadricep_motor backward (release)
-        Serial.print(" tibialis_hamstring_motor contracts and calf_quadricep_motor releases: ");
+      case 'w': //HOTKEY = h, ankle_motor releases
+        Serial.print("Ankle_motor releases: ");
         Serial.println(millis());
-       // Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(CONTRACT_TIBIALIS);
-        calf_quadricep_motor->run(RELEASE_CALF);
-        for (int i = 0; i < desired_Speed; i++) {
-          tibialis_hamstring_motor->setSpeed(i);
-          calf_quadricep_motor->setSpeed(i);
-        }
+        digitalWrite(ANKLE_POSITIVE, LOW);
+        digitalWrite(ANKLE_NEGATIVE, HIGH);
+        for (int i = 0; i < desired_speed; i++) analogWrite(ANKLE_PWM, i); // contract the muscles at desired speed
         delay(5);
         break;
-      case 'o': //HOTKEY = o, move tibialis_hamstring_motor forward (release) and calf_quadricep_motor forward (contract)
-        Serial.print("tibialis_hamstring_motor releases and calf_quadricep_motor contracts: ");
-        Serial.println(millis());
-        //Serial.println(desired_Speed);
-        tibialis_hamstring_motor->run(RELEASE_TIBIALIS);
-        calf_quadricep_motor->run(CONTRACT_CALF);
-        for (int i = 0; i < desired_Speed; i++) {
-          tibialis_hamstring_motor->setSpeed(i);
-          calf_quadricep_motor->setSpeed(i);
-        }
-        delay(5);
-        break;
+//
+//      case 'f': //HOTKEY = f, move tibialis_hamstring_motor backward and calf_quadricep_motor forward - contracts
+//        Serial.print("both tibialis_hamstring_motor and calf_quadricep_motor contracts: ");
+//         Serial.println(millis());
+//        //Serial.println(desired_Speed);
+//        tibialis_hamstring_motor->run(CONTRACT_TIBIALIS);
+//        calf_quadricep_motor->run(CONTRACT_CALF);
+//        for (int i = 0; i < desired_Speed; i++) {
+//          tibialis_hamstring_motor->setSpeed(i);
+//          calf_quadricep_motor->setSpeed(i / 2);
+//        }
+//        delay(5);
+//        break;
+//      case 'b': //HOTKEY = b, move tibialis_hamstring_motor forward and calf_quadricep_motor backward - releases
+//        Serial.print("Both tibialis_hamstring_motor and calf_quadricep_motor releases: ");
+//         Serial.println(millis());
+//        //Serial.println(desired_Speed);
+//        tibialis_hamstring_motor->run(RELEASE_TIBIALIS);
+//        calf_quadricep_motor->run(RELEASE_CALF);
+//        for (int i = 0; i < desired_Speed; i++) {
+//          tibialis_hamstring_motor->setSpeed(i / 2);
+//          calf_quadricep_motor->setSpeed(i);
+//        }
+//        delay(5);
+//        break;
+//
+//      case 'a': //HOTKEY = i, move tibialis_hamstring_motor backward (contract) and calf_quadricep_motor backward (release)
+//        Serial.print(" tibialis_hamstring_motor contracts and calf_quadricep_motor releases: ");
+//        Serial.println(millis());
+//       // Serial.println(desired_Speed);
+//        tibialis_hamstring_motor->run(CONTRACT_TIBIALIS);
+//        calf_quadricep_motor->run(RELEASE_CALF);
+//        for (int i = 0; i < desired_Speed; i++) {
+//          tibialis_hamstring_motor->setSpeed(i);
+//          calf_quadricep_motor->setSpeed(i);
+//        }
+//        delay(5);
+//        break;
+//      case 'o': //HOTKEY = o, move tibialis_hamstring_motor forward (release) and calf_quadricep_motor forward (contract)
+//        Serial.print("tibialis_hamstring_motor releases and calf_quadricep_motor contracts: ");
+//        Serial.println(millis());
+//        //Serial.println(desired_Speed);
+//        tibialis_hamstring_motor->run(RELEASE_TIBIALIS);
+//        calf_quadricep_motor->run(CONTRACT_CALF);
+//        for (int i = 0; i < desired_Speed; i++) {
+//          tibialis_hamstring_motor->setSpeed(i);
+//          calf_quadricep_motor->setSpeed(i);
+//        }
+//        delay(5);
+//        break;
 
       //motors move forward at different speeds
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <OpenSimDocument Version="30000">
 	<Model name="model1_ground_fixedknee">
-		<credits>Erik Jung, Lawrence Ngo, Nicholas Cessna, Chris Cheney, Adam Buderi.</credits>
+		<credits>Erik Jung, Chris Cheney, Adam Buderi.</credits>
 		<length_units>meters</length_units>
 		<force_units>N</force_units>
 		<!--Acceleration due to gravity.-->
